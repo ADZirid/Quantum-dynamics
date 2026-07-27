@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Politique de confidentialité — Quantum Dynamics{% endblock %}
+
+{% block meta_description %}Politique de confidentialité de Quantum Dynamics : données collectées, finalités, durée de conservation, droits RGPD et cookies.{% endblock %}
+
+{% block content %}
+{# Gabarit éditorial commun aux pages légales. #}
+{# Contenu toujours visible : aucune animation d'opacité. #}
+<div class="bg-paper py-16 md:py-24">
+  <div class="container-qd">
+    {# En-tête #}
+    <header class="max-w-[720px]">
+      <p class="label-mono text-energy">[ Légal ]</p>
+      <h1 class="mt-5 font-display text-[32px] font-bold leading-[1.1] tracking-[-0.02em] text-ink md:text-[44px]">
+        Politique de confidentialité
+      </h1>
+      <p class="mt-4 font-mono text-[13px] text-ink-3">
+        Dernière mise à jour : 15 janvier 2025
+      </p>
+      <div class="mt-6 text-base leading-[1.7] text-ink-2">
+        <p>
+          Cette page explique quelles données personnelles Quantum Dynamics collecte, pourquoi, et
+          comment exercer vos droits. Pour toute question, contactez le bureau à
+          <a href="mailto:quantumdynamics.asso@gmail.com" class="text-energy underline underline-offset-2 transition-colors hover:text-energy-deep">quantumdynamics.asso@gmail.com</a>
+          .
+        </p>
+      </div>
+    </header>
+
+    {# Sommaire #}
+    <nav aria-label="Sommaire" class="mt-10 max-w-[720px] rounded border border-line bg-white p-6">
+      <p class="label-mono text-[11px] text-ink-3">Sommaire</p>
+      <ol class="mt-3 space-y-2">
+        <li><a href="#editeur" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">01 — Éditeur du site</a></li>
+        <li><a href="#donnees-collectees" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">02 — Données collectées</a></li>
+        <li><a href="#finalites" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">03 — Finalités du traitement</a></li>
+        <li><a href="#destinataires" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">04 — Destinataires des données</a></li>
+        <li><a href="#duree-conservation" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">05 — Durée de conservation</a></li>
+        <li><a href="#droits" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">06 — Vos droits (RGPD)</a></li>
+        <li><a href="#securite" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">07 — Sécurité</a></li>
+        <li><a href="#cookies" class="text-sm font-medium text-energy underline-offset-4 transition-colors hover:text-energy-deep hover:underline">08 — Cookies</a></li>
+      </ol>
+    </nav>
+
+    {# Corps #}
+    <div class="mt-12 max-w-[720px]">
+      <section id="editeur" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="editeur-titre">
+        <h2 id="editeur-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">01</span>
+          Éditeur du site
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>
+            Le site est édité par <strong class="font-semibold text-ink">Quantum Dynamics</strong>,
+            association étudiante régie par la loi du 1ᵉʳ juillet 1901.
+          </p>
+          <ul class="space-y-1.5">
+            <li><strong class="font-medium text-ink">Siège :</strong> 50 rue de Sèvres, 92410 Ville d'Avray</li>
+            <li><strong class="font-medium text-ink">SIRET :</strong> <span class="font-mono text-[15px]">993 125 129 00011</span></li>
+            <li>
+              <strong class="font-medium text-ink">Contact :</strong>
+              <a href="mailto:quantumdynamics.asso@gmail.com" class="text-energy underline underline-offset-2 transition-colors hover:text-energy-deep">quantumdynamics.asso@gmail.com</a>
+            </li>
+          </ul>
+          <p>
+            Quantum Dynamics est le responsable du traitement des données personnelles collectées sur
+            ce site, au sens du Règlement général sur la protection des données (RGPD).
+          </p>
+        </div>
+      </section>
+
+      <section id="donnees-collectees" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="donnees-collectees-titre">
+        <h2 id="donnees-collectees-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">02</span>
+          Données collectées
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>Nous collectons uniquement les données nécessaires au fonctionnement de l'association :</p>
+          <ul class="list-disc space-y-1.5 pl-6">
+            <li>
+              <strong class="font-medium text-ink">Formulaire d'adhésion :</strong> nom, prénom,
+              adresse email, études suivies et message de motivation (facultatif).
+            </li>
+            <li>
+              <strong class="font-medium text-ink">Espace membres :</strong> données techniques de
+              session nécessaires à la connexion sécurisée.
+            </li>
+          </ul>
+          <p>
+            Aucune donnée de navigation n'est collectée à des fins publicitaires, et aucun outil de
+            mesure d'audience tiers n'est utilisé.
+          </p>
+        </div>
+      </section>
+
+      <section id="finalites" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="finalites-titre">
+        <h2 id="finalites-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">03</span>
+          Finalités du traitement
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>Les données collectées sont utilisées exclusivement pour :</p>
+          <ul class="list-disc space-y-1.5 pl-6">
+            <li>le traitement des candidatures d'adhésion et la réponse du bureau ;</li>
+            <li>la gestion des membres et la diffusion de la newsletter ;</li>
+            <li>la publication des documents officiels et des éditions mensuelles.</li>
+          </ul>
+          <p>
+            Ces traitements reposent sur votre <strong class="font-medium text-ink">consentement</strong>
+            (case à cocher du formulaire d'adhésion) et sur l'
+            <strong class="font-medium text-ink">intérêt légitime</strong> de l'association à gérer
+            sa vie associative.
+          </p>
+        </div>
+      </section>
+
+      <section id="destinataires" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="destinataires-titre">
+        <h2 id="destinataires-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">04</span>
+          Destinataires des données
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>
+            Vos données sont accessibles aux <strong class="font-medium text-ink">membres du bureau
+            uniquement</strong>. Les candidatures sont notifiées par email à l'adresse du bureau
+            (quantumdynamics.asso@gmail.com). Aucune donnée n'est vendue, cédée ou transmise à des tiers
+            à quelque fin que ce soit.
+          </p>
+        </div>
+      </section>
+
+      <section id="duree-conservation" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="duree-conservation-titre">
+        <h2 id="duree-conservation-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">05</span>
+          Durée de conservation
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <ul class="list-disc space-y-1.5 pl-6">
+            <li>
+              <strong class="font-medium text-ink">Candidatures :</strong> 12 mois maximum après
+              réception, puis suppression.
+            </li>
+            <li>
+              <strong class="font-medium text-ink">Données de session :</strong> durée de la session
+              uniquement.
+            </li>
+            <li>
+              <strong class="font-medium text-ink">Documents publics :</strong> durée de vie de
+              l'association (archives associatives).
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="droits" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="droits-titre">
+        <h2 id="droits-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">06</span>
+          Vos droits (RGPD)
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>
+            Conformément au RGPD, vous disposez des droits d'
+            <strong class="font-medium text-ink">accès</strong>, de
+            <strong class="font-medium text-ink">rectification</strong>, d'
+            <strong class="font-medium text-ink">effacement</strong>, d'
+            <strong class="font-medium text-ink">opposition</strong> et de
+            <strong class="font-medium text-ink">portabilité</strong> concernant vos données
+            personnelles.
+          </p>
+          <p>
+            Pour exercer ces droits, écrivez à
+            <a href="mailto:quantumdynamics.asso@gmail.com" class="text-energy underline underline-offset-2 transition-colors hover:text-energy-deep">quantumdynamics.asso@gmail.com</a>
+            . Nous répondons à toute demande sous 30 jours. Vous pouvez également saisir la CNIL (
+            <a href="https://www.cnil.fr" target="_blank" rel="noreferrer" class="text-energy underline underline-offset-2 transition-colors hover:text-energy-deep">cnil.fr</a>
+            ) si vous estimez que vos droits ne sont pas respectés.
+          </p>
+        </div>
+      </section>
+
+      <section id="securite" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="securite-titre">
+        <h2 id="securite-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">07</span>
+          Sécurité
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>
+            Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos
+            données : chiffrement des échanges (HTTPS), mots de passe hashés, accès restreint à
+            l'espace d'administration et limitation du nombre d'envois des formulaires.
+          </p>
+        </div>
+      </section>
+
+      <section id="cookies" class="scroll-mt-24 border-t border-line py-10 first:border-t-0 first:pt-0" aria-labelledby="cookies-titre">
+        <h2 id="cookies-titre" class="flex items-baseline gap-4 font-display text-[22px] font-medium tracking-[-0.02em] text-ink">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">08</span>
+          Cookies
+        </h2>
+        <div class="mt-5 space-y-4 text-base leading-[1.7] text-ink-2">
+          <p>
+            Ce site n'utilise qu'un <strong class="font-medium text-ink">cookie technique de
+            session</strong>, strictement nécessaire au fonctionnement de l'espace membres. Aucun
+            cookie publicitaire, de mesure d'audience ou de traçage tiers n'est déposé.
+          </p>
+          <p>
+            Ce cookie technique étant exempté de consentement, aucune bannière de consentement n'est
+            requise sur ce site.
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

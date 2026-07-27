@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}L'association — Quantum Dynamics{% endblock %}
+
+{% block content %}
+{# ============ Section 1 — En-tête de page ============ #}
+<section class="relative overflow-hidden border-b border-line bg-paper py-16 md:py-24">
+  <div class="absolute inset-0 opacity-[0.04]" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 512px 512px;" aria-hidden="true"></div>
+  <div class="container-qd relative">
+    <p class="label-mono text-energy">[ L'association ]</p>
+    <h1 class="mt-5 font-display text-[38px] font-bold leading-[1.05] tracking-[-0.02em] text-ink md:text-[56px]">
+      Une équipe, un atelier, des prototypes.
+    </h1>
+    <p class="mt-6 max-w-[58ch] text-[17px] leading-relaxed text-ink-2 md:text-xl">
+      Quantum Dynamics est née d'une conviction simple : on apprend
+      l'ingénierie en construisant. Présentation de notre mission, de nos
+      objectifs et des personnes qui font tourner l'atelier.
+    </p>
+  </div>
+</section>
+
+{# ============ Section 2 — Mission & objectifs ============ #}
+<section class="border-b border-line bg-white py-16 md:py-24" aria-labelledby="titre-mission">
+  <div class="container-qd grid gap-12 lg:grid-cols-12 lg:gap-8">
+    {# Gauche (4 col, sticky) #}
+    <div class="lg:col-span-4">
+      <div class="lg:sticky lg:top-24">
+        <p class="label-mono text-energy">[ 01 — Notre mission ]</p>
+        <h2 id="titre-mission" class="mt-4 font-display text-3xl font-bold tracking-[-0.02em] text-ink md:text-[40px]">
+          Apprendre en construisant
+        </h2>
+      </div>
+    </div>
+
+    {# Droite (8 col) #}
+    <div class="lg:col-span-8">
+      <p class="text-[17px] leading-relaxed text-ink-2 md:text-lg">
+        Quantum Dynamics réunit des étudiantes et étudiants autour d'un
+        atelier partagé. Chaque année, l'association choisit des défis —
+        un véhicule plus efficient, une machine plus précise, un système
+        énergétique plus sobre — puis les conçoit, les fabrique et les
+        présente en compétition.
+      </p>
+
+      <ol class="mt-10 border-t border-line">
+        <li class="flex items-baseline gap-6 border-b border-line py-5">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">01</span>
+          <p class="text-base leading-relaxed text-ink-2">
+            <strong class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">Concevoir</strong>
+            — transformer des idées en plans, maquettes et simulations.
+          </p>
+        </li>
+        <li class="flex items-baseline gap-6 border-b border-line py-5">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">02</span>
+          <p class="text-base leading-relaxed text-ink-2">
+            <strong class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">Prototyper</strong>
+            — fabriquer, tester, itérer dans notre atelier.
+          </p>
+        </li>
+        <li class="flex items-baseline gap-6 border-b border-line py-5">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">03</span>
+          <p class="text-base leading-relaxed text-ink-2">
+            <strong class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">Concourir</strong>
+            — présenter nos réalisations aux concours d'ingénierie étudiants.
+          </p>
+        </li>
+        <li class="flex items-baseline gap-6 border-b border-line py-5">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">04</span>
+          <p class="text-base leading-relaxed text-ink-2">
+            <strong class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">Transmettre</strong>
+            — former chaque nouvelle génération de membres aux outils et méthodes de l'atelier.
+          </p>
+        </li>
+        <li class="flex items-baseline gap-6 border-b border-line py-5">
+          <span class="font-mono text-sm text-energy" aria-hidden="true">05</span>
+          <p class="text-base leading-relaxed text-ink-2">
+            <strong class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">Ouvrir</strong>
+            — accueillir toutes les filières, du génie mécanique à la communication.
+          </p>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+{# ============ Section 3 — Domaines ============ #}
+<section id="domaines" class="scroll-mt-16 border-b border-line bg-paper-2 py-16 md:py-24" aria-labelledby="titre-domaines">
+  <div class="container-qd">
+    <div>
+      <p class="label-mono text-energy">[ 02 — Domaines ]</p>
+      <h2 id="titre-domaines" class="mt-4 font-display text-3xl font-bold tracking-[-0.02em] text-ink md:text-[40px]">
+        Nos trois terrains de jeu
+      </h2>
+    </div>
+
+    <div class="mt-12 grid gap-6 md:grid-cols-3">
+      <article class="group flex flex-col rounded border border-line bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-energy hover:shadow-hover">
+        <div class="overflow-hidden border-b border-line">
+          <img src="{% static 'illu/domaine-transports.svg' %}" alt="Véhicule stylisé en aplats avec sa trajectoire, style flat design" class="aspect-[4/3] w-full transition-transform [transition-duration:400ms] ease-out group-hover:scale-[1.03]" loading="lazy">
+        </div>
+        <div class="flex flex-1 flex-col p-6">
+          <p class="font-mono text-[11px] uppercase tracking-[0.08em] text-energy">01</p>
+          <h3 class="mt-2 font-display text-[19px] font-medium tracking-[-0.02em] text-ink md:text-[22px]">Transports</h3>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-2">
+            Conception et prototypage autour de la mobilité : véhicules, propulsion, aérodynamique.
+          </p>
+        </div>
+      </article>
+
+      <article class="group flex flex-col rounded border border-line bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-energy hover:shadow-hover">
+        <div class="overflow-hidden border-b border-line">
+          <img src="{% static 'illu/domaine-industrie.svg' %}" alt="Deux engrenages pleins en prise avec un élément de machine, style flat design" class="aspect-[4/3] w-full transition-transform [transition-duration:400ms] ease-out group-hover:scale-[1.03]" loading="lazy">
+        </div>
+        <div class="flex flex-1 flex-col p-6">
+          <p class="font-mono text-[11px] uppercase tracking-[0.08em] text-energy">02</p>
+          <h3 class="mt-2 font-display text-[19px] font-medium tracking-[-0.02em] text-ink md:text-[22px]">Industrie</h3>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-2">
+            Mécanique, fabrication et automatisation : de la pièce au système complet.
+          </p>
+        </div>
+      </article>
+
+      <article class="group flex flex-col rounded border border-line bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-energy hover:shadow-hover">
+        <div class="overflow-hidden border-b border-line">
+          <img src="{% static 'illu/domaine-energie.svg' %}" alt="Éolienne pleine sur des collines avec un soleil, style flat design" class="aspect-[4/3] w-full transition-transform [transition-duration:400ms] ease-out group-hover:scale-[1.03]" loading="lazy">
+        </div>
+        <div class="flex flex-1 flex-col p-6">
+          <p class="font-mono text-[11px] uppercase tracking-[0.08em] text-energy">03</p>
+          <h3 class="mt-2 font-display text-[19px] font-medium tracking-[-0.02em] text-ink md:text-[22px]">Énergie</h3>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-2">
+            Efficacité énergétique et systèmes d'alimentation pour des prototypes durables.
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# ============ Section 4 — Notre démarche (section sombre) ============ #}
+<section class="overflow-hidden border-b border-line-dark bg-ink py-16 text-[#F2F1EC] md:py-24" aria-labelledby="titre-demarche">
+  <div class="container-qd grid gap-12 lg:grid-cols-12 lg:gap-8">
+    {# Gauche (6 col) — présentation #}
+    <div class="lg:col-span-6">
+      <div>
+        <p class="label-mono text-energy-light">[ 03 — Notre démarche ]</p>
+        <h2 id="titre-demarche" class="mt-4 font-display text-3xl font-bold tracking-[-0.02em] md:text-[40px]">
+          De la théorie à la pratique
+        </h2>
+      </div>
+
+      <div class="mt-10 space-y-6 text-base leading-relaxed text-[#9AA39E]">
+        <p>
+          Quantum Dynamics est née de la volonté d'étudiantes et
+          d'étudiants en ingénierie de passer de la théorie à la pratique
+          : concevoir de vraies machines, les fabriquer de leurs mains,
+          puis les confronter à la réalité d'une compétition.
+        </p>
+        <p>
+          Au fil des projets, l'association s'est organisée autour de
+          trois pôles techniques — transports, industrie et énergie —
+          réunis dans un même atelier. Chaque génération de membres
+          transmet à la suivante ses méthodes, ses outils et ses retours
+          d'expérience.
+        </p>
+        <p>
+          L'atelier reste le cœur de l'association : un lieu ouvert à
+          toutes les filières, où chaque idée peut devenir un prototype.
+        </p>
+      </div>
+    </div>
+
+    {# Droite (6 col) — image cadrée #}
+    <div class="lg:col-span-6">
+      <figure>
+        <div class="relative overflow-hidden border border-line-dark bg-[#1B2320] p-2">
+          <span class="absolute -left-0.5 -top-0.5 z-10 h-4 w-4 border-l border-t border-[#9AA39E]" aria-hidden="true"></span>
+          <span class="absolute -right-0.5 -top-0.5 z-10 h-4 w-4 border-r border-t border-[#9AA39E]" aria-hidden="true"></span>
+          <span class="absolute -bottom-0.5 -left-0.5 z-10 h-4 w-4 border-b border-l border-[#9AA39E]" aria-hidden="true"></span>
+          <span class="absolute -bottom-0.5 -right-0.5 z-10 h-4 w-4 border-b border-r border-[#9AA39E]" aria-hidden="true"></span>
+          <img src="{% static 'illu/atelier-etabli.svg' %}" alt="Plan type de l'atelier de l'association : établi, machines et rangements, style flat design" class="aspect-[12/5] w-full" loading="lazy">
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+{# ============ Section 5 — Le bureau ============ #}
+<section class="border-b border-line bg-paper py-16 md:py-24" aria-labelledby="titre-bureau">
+  <div class="container-qd">
+    <div>
+      <p class="label-mono text-energy">[ 04 — Le bureau ]</p>
+      <h2 id="titre-bureau" class="mt-4 font-display text-3xl font-bold tracking-[-0.02em] text-ink md:text-[40px]">
+        Les personnes derrière les prototypes
+      </h2>
+      <p class="mt-3 max-w-[60ch] text-base text-ink-2">
+        Le bureau est élu chaque année en assemblée générale.
+      </p>
+    </div>
+
+    {% if members %}
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {% for membre in members %}
+          <article class="group rounded border border-line bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-energy hover:shadow-hover">
+            <div class="overflow-hidden border-b border-line">
+              {% if membre.photo_url %}
+                <img src="{{ membre.photo_url }}" alt="Portrait de {{ membre.name }}, {{ membre.role }} de Quantum Dynamics" class="aspect-square w-full object-cover transition-transform [transition-duration:400ms] ease-out group-hover:scale-[1.02]" loading="lazy">
+              {% else %}
+                {# Monogramme : initiales sur fond bg-paper-2 #}
+                <div class="flex aspect-square w-full items-center justify-center bg-paper-2" role="img" aria-label="Portrait de {{ membre.name }}, {{ membre.role }} de Quantum Dynamics (monogramme)">
+                  <span class="flex h-20 w-20 items-center justify-center rounded-full border border-line bg-white font-display text-2xl font-semibold tracking-[-0.02em] text-ink-2" aria-hidden="true">{{ membre.initiales }}</span>
+                </div>
+              {% endif %}
+            </div>
+            <div class="p-6">
+              <h3 class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">{{ membre.name }}</h3>
+              <p class="mt-2 inline-block rounded border border-energy px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.08em] text-energy transition-transform duration-200 group-hover:-translate-y-0.5">{{ membre.role }}</p>
+              {% if membre.bio %}
+                <p class="mt-3 text-sm leading-relaxed text-ink-2">{{ membre.bio }}</p>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      {# Aucun membre enregistré : placeholders neutres (aucun nom, aucune photo) #}
+      <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {% for poste in placeholders %}
+          <article class="rounded border border-dashed border-line bg-white">
+            <div class="flex aspect-square w-full flex-col items-center justify-center gap-4 border-b border-line bg-paper-2">
+              <span class="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-white text-ink-3" aria-hidden="true">
+                <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <span class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">{{ poste.initiales }}</span>
+            </div>
+            <div class="p-6">
+              <h3 class="font-display text-[19px] font-medium tracking-[-0.02em] text-ink">{{ poste.role }}</h3>
+              <p class="mt-2 inline-block rounded border border-line px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">À compléter via l'espace membres</p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{# ============ Section 6 — Bandeau CTA ============ #}
+<section class="bg-paper-2 py-16 md:py-24" aria-labelledby="titre-cta">
+  <div class="container-qd text-center">
+    <h2 id="titre-cta" class="font-display text-3xl font-bold tracking-[-0.02em] text-ink md:text-[40px]">
+      Convaincu·e ?
+    </h2>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+      <a href="{% url 'website:rejoindre' %}" class="btn-signal group">
+        Rejoindre l'association
+        <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+      <a href="{% url 'library:newsletter_list' %}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-energy transition-colors hover:text-energy-deep">
+        Lire notre newsletter
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

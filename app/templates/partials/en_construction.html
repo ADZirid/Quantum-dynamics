@@ -1,0 +1,11 @@
+{# Stub « en construction » — attend `titre` (et optionnellement `texte`). #}
+<section class="border-b border-line bg-paper py-24 md:py-32">
+  <div class="container-qd">
+    <p class="label-mono text-energy">[ En construction ]</p>
+    <h1 class="mt-4 font-display text-3xl font-bold tracking-[-0.02em] text-ink md:text-[40px]">{{ titre }}</h1>
+    <p class="mt-4 max-w-[60ch] text-base leading-relaxed text-ink-2">
+      {{ texte|default:"Cette page est en cours de migration vers la nouvelle plateforme. Elle sera disponible très prochainement." }}
+    </p>
+    <a href="{% url 'website:home' %}" class="btn-secondary mt-8">Retour à l'accueil</a>
+  </div>
+</section>

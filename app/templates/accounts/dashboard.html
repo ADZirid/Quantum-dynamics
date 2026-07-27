@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Tableau de bord — Quantum Dynamics{% endblock %}
+{% block meta_description %}Tableau de bord du bureau Quantum Dynamics : newsletters, documents, candidatures, membres et sécurité.{% endblock %}
+{% block content %}
+<div class="bg-paper">
+  <div class="container-qd flex flex-col gap-6 py-8 lg:flex-row lg:gap-8 lg:py-12">
+
+    {# ---- Barre latérale ---- #}
+    <div class="lg:w-60 lg:shrink-0">
+      <div class="lg:sticky lg:top-20">
+        <div class="rounded border border-line bg-white p-4">
+          <div class="flex items-center gap-2.5">
+            <img src="{% static 'img/logo-mark.png' %}" alt="" class="h-8 w-auto" width="26" height="32">
+            <div>
+              <p class="font-display text-[15px] font-semibold tracking-[-0.02em] text-ink">Administration</p>
+              <span class="mt-0.5 inline-block rounded border border-energy/40 bg-energy/10 px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.08em] text-energy">Bureau</span>
+            </div>
+          </div>
+
+          {# Navigation par onglets : liens serveur ?onglet= (fonctionne sans JS) #}
+          <nav aria-label="Sections du tableau de bord" class="mt-4 flex flex-row items-stretch gap-1 overflow-x-auto lg:flex-col">
+            {% for key, label in tabs %}
+            <a href="?onglet={{ key }}" data-tab-link="{{ key }}"
+               class="flex shrink-0 items-center justify-start gap-2.5 whitespace-nowrap rounded border-l-2 px-3 py-2.5 text-sm font-medium transition-colors hover:bg-paper-2/70 hover:text-ink {% if tab == key %}border-energy bg-paper-2 text-ink{% else %}border-transparent text-ink-2{% endif %}">{{ label }}</a>
+            {% endfor %}
+          </nav>
+
+          {# Utilisateur connecté + déconnexion #}
+          <div class="mt-4 border-t border-line pt-4">
+            <p class="font-mono text-xs text-ink-3">Connecté : <span class="text-ink">{{ user.username }}</span></p>
+            <form method="post" action="{% url 'accounts_app:logout' %}" class="mt-2">
+              {% csrf_token %}
+              <button type="submit" class="btn-quiet w-full justify-start hover:border-danger/50 hover:text-danger">
+                <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                Se déconnecter
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ---- Contenu ---- #}
+    <div class="min-w-0 flex-1">
+
+      {# Messages de succès / erreur #}
+      {% if messages %}
+      <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div role="alert" class="rounded border px-3.5 py-3 text-[13px] font-medium {% if message.tags == 'success' %}border-energy/40 bg-energy/10 text-energy{% else %}border-danger/40 bg-danger/10 text-danger{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {# ================= Vue d'ensemble ================= #}
+      <section data-tab-panel="overview" {% if tab != 'overview' %}hidden{% endif %} aria-label="Vue d'ensemble">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Vue d'ensemble</h1>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div class="rounded border border-line bg-white p-5">
+            <p class="label-mono text-ink-3">Newsletters</p>
+            <p class="mt-2 font-display text-3xl font-semibold text-ink">{{ counts.newsletters }}</p>
+          </div>
+          <div class="rounded border border-line bg-white p-5">
+            <p class="label-mono text-ink-3">Documents</p>
+            <p class="mt-2 font-display text-3xl font-semibold text-ink">{{ counts.documents }}</p>
+          </div>
+          <div class="rounded border border-line bg-white p-5">
+            <p class="label-mono text-ink-3">Candidatures « nouveau »</p>
+            <p class="mt-2 font-display text-3xl font-semibold text-signal">{{ counts.candidatures_nouveau }}</p>
+          </div>
+          <div class="rounded border border-line bg-white p-5">
+            <p class="label-mono text-ink-3">Membres du bureau</p>
+            <p class="mt-2 font-display text-3xl font-semibold text-ink">{{ counts.membres }}</p>
+          </div>
+        </div>
+
+        <h2 class="mt-8 font-display text-lg font-medium text-ink">Dernières candidatures</h2>
+        {% if dernieres_candidatures %}
+        <ul class="mt-4 divide-y divide-line rounded border border-line bg-white">
+          {% for candidature in dernieres_candidatures %}
+          <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+            <div>
+              <p class="text-sm font-medium text-ink">{{ candidature.first_name }} {{ candidature.last_name }}</p>
+              <p class="text-[13px] text-ink-3">{{ candidature.studies }} · {{ candidature.created_at|date:"d/m/Y" }}</p>
+            </div>
+            <span class="rounded border px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.08em] {% if candidature.status == 'nouveau' %}border-signal/40 bg-signal/10 text-signal{% elif candidature.status == 'accepte' %}border-energy/40 bg-energy/10 text-energy{% elif candidature.status == 'refuse' %}border-danger/40 bg-danger/10 text-danger{% else %}border-line text-ink-2{% endif %}">{{ candidature.get_status_display }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucune candidature pour le moment.</p>
+        {% endif %}
+      </section>
+
+      {# ================= Newsletter ================= #}
+      <section data-tab-panel="newsletter" {% if tab != 'newsletter' %}hidden{% endif %} aria-label="Newsletter">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Newsletter</h1>
+
+        <div class="mt-6 rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Publier une édition</h2>
+          <form method="post" action="{% url 'accounts_app:newsletter_create' %}" enctype="multipart/form-data" class="mt-4 space-y-4">
+            {% csrf_token %}
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="nl-title" class="label-mono block text-ink-2">Titre</label>
+                <input id="nl-title" name="title" type="text" required maxlength="200" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="nl-edition" class="label-mono block text-ink-2">Numéro d'édition</label>
+                <input id="nl-edition" name="edition" type="number" min="1" step="1" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label for="nl-summary" class="label-mono block text-ink-2">Résumé (280 caractères max)</label>
+              <textarea id="nl-summary" name="summary" rows="3" maxlength="280" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none"></textarea>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="nl-published" class="label-mono block text-ink-2">Date de publication</label>
+                <input id="nl-published" name="published_at" type="date" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="nl-file" class="label-mono block text-ink-2">Fichier PDF (15 Mo max)</label>
+                <input id="nl-file" name="file" type="file" accept="application/pdf,.pdf" required class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink file:mr-3 file:rounded file:border file:border-line file:bg-paper-2 file:px-3 file:py-1 file:text-[13px] file:font-medium file:text-ink-2">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Publier l'édition</button>
+          </form>
+        </div>
+
+        <h2 class="mt-8 font-display text-lg font-medium text-ink">Éditions publiées</h2>
+        {% if newsletters %}
+        <ul class="mt-4 divide-y divide-line rounded border border-line bg-white">
+          {% for newsletter in newsletters %}
+          <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <div>
+              <p class="text-sm font-medium text-ink">Édition {{ newsletter.edition }} — {{ newsletter.title }}</p>
+              <p class="text-[13px] text-ink-3">Publiée le {{ newsletter.published_at|date:"d/m/Y" }} · {{ newsletter.file_size|filesizeformat }}</p>
+            </div>
+            <form method="post" action="{% url 'accounts_app:newsletter_delete' newsletter.pk %}" data-confirm="Supprimer définitivement l'édition {{ newsletter.edition }} — {{ newsletter.title }} ?">
+              {% csrf_token %}
+              <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Supprimer</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucune édition publiée pour le moment.</p>
+        {% endif %}
+      </section>
+
+      {# ================= Documents ================= #}
+      <section data-tab-panel="documents" {% if tab != 'documents' %}hidden{% endif %} aria-label="Documents">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Documents</h1>
+
+        <div class="mt-6 rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Ajouter un document</h2>
+          <form method="post" action="{% url 'accounts_app:document_create' %}" enctype="multipart/form-data" class="mt-4 space-y-4">
+            {% csrf_token %}
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="doc-title" class="label-mono block text-ink-2">Titre</label>
+                <input id="doc-title" name="title" type="text" required maxlength="200" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="doc-category" class="label-mono block text-ink-2">Catégorie</label>
+                <select id="doc-category" name="category" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  {% for value, label in document_categories %}
+                  <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label for="doc-description" class="label-mono block text-ink-2">Description</label>
+              <textarea id="doc-description" name="description" rows="3" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none"></textarea>
+            </div>
+            <div class="space-y-1.5">
+              <label for="doc-file" class="label-mono block text-ink-2">Fichier PDF (15 Mo max)</label>
+              <input id="doc-file" name="file" type="file" accept="application/pdf,.pdf" required class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink file:mr-3 file:rounded file:border file:border-line file:bg-paper-2 file:px-3 file:py-1 file:text-[13px] file:font-medium file:text-ink-2">
+            </div>
+            <button type="submit" class="btn-primary">Ajouter le document</button>
+          </form>
+        </div>
+
+        <h2 class="mt-8 font-display text-lg font-medium text-ink">Documents publiés</h2>
+        {% if documents %}
+        <ul class="mt-4 space-y-3">
+          {% for document in documents %}
+          <li class="rounded border border-line bg-white p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-medium text-ink">{{ document.title }}</p>
+                <p class="text-[13px] text-ink-3">{{ document.get_category_display }} · {{ document.file_size|filesizeformat }} · ajouté le {{ document.created_at|date:"d/m/Y" }}</p>
+              </div>
+              <form method="post" action="{% url 'accounts_app:document_delete' document.pk %}" data-confirm="Supprimer définitivement le document « {{ document.title }} » ?">
+                {% csrf_token %}
+                <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Supprimer</button>
+              </form>
+            </div>
+            <details class="mt-3">
+              <summary class="cursor-pointer text-[13px] font-medium text-ink-2 transition-colors hover:text-ink">Modifier les métadonnées</summary>
+              <form method="post" action="{% url 'accounts_app:document_update' document.pk %}" class="mt-3 space-y-3 border-t border-line pt-3">
+                {% csrf_token %}
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div class="space-y-1.5">
+                    <label for="doc-edit-title-{{ document.pk }}" class="label-mono block text-ink-2">Titre</label>
+                    <input id="doc-edit-title-{{ document.pk }}" name="title" type="text" required maxlength="200" value="{{ document.title }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label for="doc-edit-category-{{ document.pk }}" class="label-mono block text-ink-2">Catégorie</label>
+                    <select id="doc-edit-category-{{ document.pk }}" name="category" required class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                      {% for value, label in document_categories %}
+                      <option value="{{ value }}" {% if document.category == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="space-y-1.5">
+                  <label for="doc-edit-description-{{ document.pk }}" class="label-mono block text-ink-2">Description</label>
+                  <textarea id="doc-edit-description-{{ document.pk }}" name="description" rows="2" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">{{ document.description }}</textarea>
+                </div>
+                <p class="text-[12px] text-ink-3">Le fichier PDF associé n'est pas modifiable ; supprimez puis recréez le document pour le remplacer.</p>
+                <button type="submit" class="btn-secondary">Enregistrer</button>
+              </form>
+            </details>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucun document publié pour le moment.</p>
+        {% endif %}
+      </section>
+
+      {# ================= Candidatures ================= #}
+      <section data-tab-panel="candidatures" {% if tab != 'candidatures' %}hidden{% endif %} aria-label="Candidatures">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Candidatures</h1>
+
+        {# Filtre par statut (GET, fonctionne sans JS) #}
+        <form method="get" action="{% url 'accounts_app:dashboard' %}" class="mt-6 flex flex-wrap items-center gap-3">
+          <input type="hidden" name="onglet" value="candidatures">
+          <label for="filtre-statut" class="label-mono text-ink-2">Filtrer par statut</label>
+          <select id="filtre-statut" name="statut" class="rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+            <option value="">Tous</option>
+            {% for value, label in candidature_statuses %}
+            <option value="{{ value }}" {% if filtre_statut == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn-quiet">Filtrer</button>
+        </form>
+
+        {% if candidatures %}
+        <div class="mt-4 overflow-x-auto rounded border border-line bg-white">
+          <table class="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr class="border-b border-line">
+                <th class="label-mono px-4 py-3 text-ink-3">Nom</th>
+                <th class="label-mono px-4 py-3 text-ink-3">Prénom</th>
+                <th class="label-mono px-4 py-3 text-ink-3">E-mail</th>
+                <th class="label-mono px-4 py-3 text-ink-3">Études</th>
+                <th class="label-mono px-4 py-3 text-ink-3">Date</th>
+                <th class="label-mono px-4 py-3 text-ink-3">Statut</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-line">
+              {% for candidature in candidatures %}
+              <tr class="align-top">
+                <td class="px-4 py-3 font-medium text-ink">{{ candidature.last_name }}</td>
+                <td class="px-4 py-3 text-ink">{{ candidature.first_name }}</td>
+                <td class="px-4 py-3 text-ink-2">{{ candidature.email }}</td>
+                <td class="px-4 py-3 text-ink-2">{{ candidature.studies }}</td>
+                <td class="px-4 py-3 text-ink-2">{{ candidature.created_at|date:"d/m/Y" }}</td>
+                <td class="px-4 py-3">
+                  <form method="post" action="{% url 'accounts_app:application_status' candidature.pk %}" class="flex items-center gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="filtre" value="{{ filtre_statut }}">
+                    <select name="status" aria-label="Statut de la candidature de {{ candidature.first_name }} {{ candidature.last_name }}" class="rounded border border-line bg-white px-2.5 py-1.5 text-[13px] text-ink transition-colors focus:border-energy focus:outline-none">
+                      {% for value, label in candidature_statuses %}
+                      <option value="{{ value }}" {% if candidature.status == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn-quiet">Mettre à jour</button>
+                  </form>
+                </td>
+              </tr>
+              <tr class="border-b border-line">
+                <td colspan="6" class="px-4 py-3">
+                  <details>
+                    <summary class="cursor-pointer text-[13px] font-medium text-ink-2 transition-colors hover:text-ink">Voir la motivation</summary>
+                    <p class="mt-2 whitespace-pre-line rounded bg-paper-2/70 px-3.5 py-3 text-[13px] text-ink-2">{{ candidature.motivation }}</p>
+                  </details>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucune candidature{% if filtre_statut %} avec ce statut{% endif %}.</p>
+        {% endif %}
+      </section>
+
+      {# ================= Bureau & membres ================= #}
+      <section data-tab-panel="bureau" {% if tab != 'bureau' %}hidden{% endif %} aria-label="Bureau et membres">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Bureau &amp; membres</h1>
+
+        <div class="mt-6 rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Ajouter un membre</h2>
+          <form method="post" action="{% url 'accounts_app:member_create' %}" class="mt-4 space-y-4">
+            {% csrf_token %}
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="mb-name" class="label-mono block text-ink-2">Nom</label>
+                <input id="mb-name" name="name" type="text" required maxlength="120" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="mb-role" class="label-mono block text-ink-2">Rôle</label>
+                <input id="mb-role" name="role" type="text" required maxlength="120" placeholder="Présidente, Trésorier…" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label for="mb-bio" class="label-mono block text-ink-2">Bio</label>
+              <textarea id="mb-bio" name="bio" rows="3" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none"></textarea>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="mb-photo" class="label-mono block text-ink-2">Photo (URL, optionnel)</label>
+                <input id="mb-photo" name="photo_url" type="url" placeholder="https://… (vide = monogramme)" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="mb-order" class="label-mono block text-ink-2">Ordre d'affichage</label>
+                <input id="mb-order" name="display_order" type="number" min="0" step="1" value="0" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Ajouter le membre</button>
+          </form>
+        </div>
+
+        <h2 class="mt-8 font-display text-lg font-medium text-ink">Membres actuels</h2>
+        {% if membres %}
+        <ul class="mt-4 space-y-3">
+          {% for membre in membres %}
+          <li class="rounded border border-line bg-white p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                {% if membre.photo_url %}
+                <img src="{{ membre.photo_url }}" alt="" class="h-10 w-10 rounded-full border border-line object-cover" width="40" height="40">
+                {% else %}
+                <span class="flex h-10 w-10 items-center justify-center rounded-full border border-energy/40 bg-energy/10 font-mono text-xs font-semibold uppercase text-energy" aria-hidden="true">{{ membre.name|slice:":1" }}</span>
+                {% endif %}
+                <div>
+                  <p class="text-sm font-medium text-ink">{{ membre.name }}</p>
+                  <p class="text-[13px] text-ink-3">{{ membre.role }} · ordre {{ membre.display_order }}</p>
+                </div>
+              </div>
+              <form method="post" action="{% url 'accounts_app:member_delete' membre.pk %}" data-confirm="Supprimer définitivement le membre « {{ membre.name }} » ?">
+                {% csrf_token %}
+                <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Supprimer</button>
+              </form>
+            </div>
+            <details class="mt-3">
+              <summary class="cursor-pointer text-[13px] font-medium text-ink-2 transition-colors hover:text-ink">Modifier</summary>
+              <form method="post" action="{% url 'accounts_app:member_update' membre.pk %}" class="mt-3 space-y-3 border-t border-line pt-3">
+                {% csrf_token %}
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div class="space-y-1.5">
+                    <label for="mb-edit-name-{{ membre.pk }}" class="label-mono block text-ink-2">Nom</label>
+                    <input id="mb-edit-name-{{ membre.pk }}" name="name" type="text" required maxlength="120" value="{{ membre.name }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label for="mb-edit-role-{{ membre.pk }}" class="label-mono block text-ink-2">Rôle</label>
+                    <input id="mb-edit-role-{{ membre.pk }}" name="role" type="text" required maxlength="120" value="{{ membre.role }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                </div>
+                <div class="space-y-1.5">
+                  <label for="mb-edit-bio-{{ membre.pk }}" class="label-mono block text-ink-2">Bio</label>
+                  <textarea id="mb-edit-bio-{{ membre.pk }}" name="bio" rows="2" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">{{ membre.bio }}</textarea>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <div class="space-y-1.5">
+                    <label for="mb-edit-photo-{{ membre.pk }}" class="label-mono block text-ink-2">Photo (URL, optionnel)</label>
+                    <input id="mb-edit-photo-{{ membre.pk }}" name="photo_url" type="url" value="{{ membre.photo_url }}" placeholder="https://… (vide = monogramme)" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label for="mb-edit-order-{{ membre.pk }}" class="label-mono block text-ink-2">Ordre d'affichage</label>
+                    <input id="mb-edit-order-{{ membre.pk }}" name="display_order" type="number" min="0" step="1" value="{{ membre.display_order }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                </div>
+                <button type="submit" class="btn-secondary">Enregistrer</button>
+              </form>
+            </details>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucun membre pour le moment.</p>
+        {% endif %}
+      </section>
+
+      {# ================= Sécurité ================= #}
+      <section data-tab-panel="securite" {% if tab != 'securite' %}hidden{% endif %} aria-label="Sécurité">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Sécurité</h1>
+
+        <div class="mt-6 max-w-[480px] rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Changer le mot de passe</h2>
+          <p class="mt-1 text-[13px] text-ink-3">12 caractères minimum, non évident et non entièrement numérique.</p>
+          <form method="post" action="{% url 'accounts_app:password_change' %}" class="mt-4 space-y-4">
+            {% csrf_token %}
+            <div class="space-y-1.5">
+              <label for="id_old_password" class="label-mono block text-ink-2">Mot de passe actuel</label>
+              <input id="id_old_password" name="old_password" type="password" autocomplete="current-password" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+            </div>
+            <div class="space-y-1.5">
+              <label for="id_new_password1" class="label-mono block text-ink-2">Nouveau mot de passe</label>
+              <input id="id_new_password1" name="new_password1" type="password" autocomplete="new-password" required minlength="12" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+            </div>
+            <div class="space-y-1.5">
+              <label for="id_new_password2" class="label-mono block text-ink-2">Confirmer le nouveau mot de passe</label>
+              <input id="id_new_password2" name="new_password2" type="password" autocomplete="new-password" required minlength="12" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+            </div>
+            <button type="submit" class="btn-primary">Mettre à jour le mot de passe</button>
+          </form>
+        </div>
+
+        <div class="mt-6 max-w-[480px] rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Session</h2>
+          <p class="mt-1 text-[13px] text-ink-3">Connecté en tant que <span class="font-medium text-ink">{{ user.username }}</span>.</p>
+          <form method="post" action="{% url 'accounts_app:logout' %}" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn-secondary hover:border-danger/50 hover:text-danger">Se déconnecter</button>
+          </form>
+        </div>
+      </section>
+
+      {# Barre basse admin #}
+      <p class="mt-12 border-t border-line pt-4 font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Quantum Dynamics — Administration · v1.0</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/dashboard.js' %}" defer></script>
+{% endblock %}

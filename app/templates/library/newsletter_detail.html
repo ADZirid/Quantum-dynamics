@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% load format_fr %}
+{% block title %}{% if edition %}{{ edition.title }} — Newsletter — Quantum Dynamics{% else %}Édition introuvable — Quantum Dynamics{% endif %}{% endblock %}
+{% block content %}
+{% if edition %}
+{# ============ Barre d'outils sticky ============ #}
+<div class="sticky top-16 z-40 border-b border-line bg-paper/95 backdrop-blur-[8px]">
+  <div class="container-qd flex flex-col gap-3 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <a href="{% url 'library:newsletter_list' %}" class="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-ink-3 transition-colors hover:text-energy">
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Retour aux éditions
+    </a>
+    <div class="flex min-w-0 items-center gap-3">
+      <span class="inline-flex shrink-0 items-center rounded border border-energy px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.08em] text-energy">Newsletter</span>
+      <div class="min-w-0">
+        <h1 class="truncate font-display text-base font-medium tracking-[-0.02em] text-ink">{{ edition.title }}</h1>
+        <p class="truncate font-mono text-xs text-ink-3">Édition n°{{ edition.edition }} · Publiée le {{ edition.published_at|date_fr }} · PDF · {{ edition.file_size|taille_fichier }}</p>
+      </div>
+    </div>
+    <a href="{% url 'download_file' kind='newsletter' pk=edition.pk %}" download class="btn-primary shrink-0" aria-label="Télécharger {{ edition.title }} (PDF, {{ edition.file_size|taille_fichier }})">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Télécharger
+    </a>
+  </div>
+</div>
+
+{# ============ Lecteur PDF ============ #}
+<section class="bg-paper py-8 md:py-12">
+  <div class="container-qd">
+    <div class="overflow-hidden rounded border border-line bg-white" data-pdf-src="{% url 'serve_file' kind='newsletter' pk=edition.pk %}">
+      <iframe data-pdf-frame title="Lecture de « {{ edition.title }} » (PDF, édition n°{{ edition.edition }})" class="h-[70dvh] w-full"></iframe>
+    </div>
+    {# Repli si le navigateur n'affiche pas le PDF #}
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded border border-dashed border-line bg-paper-2 px-4 py-3">
+      <p class="text-sm text-ink-2">Le PDF ne s'affiche pas dans votre navigateur ?</p>
+      <a href="{% url 'download_file' kind='newsletter' pk=edition.pk %}" download class="btn-quiet">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger le PDF
+      </a>
+    </div>
+
+    {# ============ Navigation édition précédente / suivante ============ #}
+    <nav class="mt-10 grid gap-4 border-y border-line py-5 sm:grid-cols-2" aria-label="Navigation entre éditions">
+      {% if precedente %}
+      <a href="{% url 'library:newsletter_detail' pk=precedente.pk %}" class="group min-w-0">
+        <span class="inline-flex items-center gap-1.5 font-mono text-[13px] text-ink-3 transition-colors group-hover:text-energy">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Édition précédente
+        </span>
+        <span class="mt-1 block truncate text-sm font-medium text-ink transition-colors group-hover:text-energy">{{ precedente.title }}</span>
+      </a>
+      {% else %}
+      <span aria-hidden="true"></span>
+      {% endif %}
+      {% if suivante %}
+      <a href="{% url 'library:newsletter_detail' pk=suivante.pk %}" class="group min-w-0 sm:text-right">
+        <span class="inline-flex items-center gap-1.5 font-mono text-[13px] text-ink-3 transition-colors group-hover:text-energy sm:flex-row-reverse">
+          Édition suivante
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </span>
+        <span class="mt-1 block truncate text-sm font-medium text-ink transition-colors group-hover:text-energy">{{ suivante.title }}</span>
+      </a>
+      {% else %}
+      <span aria-hidden="true"></span>
+      {% endif %}
+    </nav>
+  </div>
+</section>
+{% else %}
+{# ============ 404 — édition introuvable ============ #}
+<section class="container-qd flex min-h-[60dvh] flex-col items-center justify-center py-24 text-center">
+  <svg class="h-8 w-8 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <h1 class="mt-4 font-display text-2xl font-bold tracking-[-0.02em] text-ink">Cette édition est introuvable.</h1>
+  <a href="{% url 'library:newsletter_list' %}" class="btn-quiet mt-6">
+    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Retour aux éditions
+  </a>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/pdf.js' %}" defer></script>
+{% endblock %}

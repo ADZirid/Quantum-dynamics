@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+{% load format_fr %}
+{% block title %}Documents — Quantum Dynamics{% endblock %}
+{% block meta_description %}Procès-verbaux, assemblées générales, partenariats, bilans comptables : les documents officiels de Quantum Dynamics, en toute transparence.{% endblock %}
+{% block content %}
+<!-- Safelist Tailwind — NE PAS SUPPRIMER : classes injectées dynamiquement ou en JS
+   border-energy/30 bg-energy/10 text-energy bg-energy
+   border-ink-2/30 bg-ink-2/10 text-ink-2 bg-ink-2
+   border-signal/40 bg-signal/10 text-signal-deep bg-signal
+   border-[#5B6E8C]/30 bg-[#5B6E8C]/10 text-[#5B6E8C] bg-[#5B6E8C]
+   border-ink-3/30 bg-ink-3/10 text-ink-3 bg-ink-3
+   rotate-180 -->
+{# ============ Section 1 — En-tête ============ #}
+<section class="relative overflow-hidden border-b border-line bg-paper py-16 md:py-24">
+  <div class="absolute inset-0 opacity-[0.06]" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 512px 512px;" aria-hidden="true"></div>
+  <div class="container-qd relative">
+    <p class="label-mono text-energy">[ Documents officiels ]</p>
+    <h1 class="mt-5 max-w-[18ch] font-display text-[40px] font-bold leading-[1.05] tracking-[-0.02em] text-ink md:text-[56px]">
+      Les documents de l'association
+    </h1>
+    <p class="mt-6 max-w-[62ch] text-[17px] leading-relaxed text-ink-2 md:text-xl">
+      Procès-verbaux, assemblées générales, partenariats, bilans comptables : le bureau
+      publie ici les documents officiels de Quantum Dynamics, en toute transparence.
+      Filtrez par catégorie ou recherchez par nom.
+    </p>
+  </div>
+</section>
+
+{# ============ Section 2 — Recherche & filtres (sticky) ============ #}
+<div class="sticky top-16 z-40 border-b border-line bg-paper/95 backdrop-blur-[8px]">
+  <form method="get" action="{% url 'library:document_list' %}" data-formulaire-filtres
+        class="container-qd flex flex-col gap-3 py-4 md:flex-row md:items-center">
+    <input type="hidden" name="soumis" value="1">
+
+    {# Recherche par nom (serveur : title__icontains) #}
+    <div class="relative min-w-[260px] flex-1">
+      <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <label for="recherche-document" class="sr-only">Rechercher un document par son nom</label>
+      <input id="recherche-document" type="search" name="q" value="{{ q }}" placeholder="Rechercher un document par son nom…"
+             class="w-full rounded border border-line bg-white py-2.5 pl-9 pr-3 text-sm text-ink placeholder:text-ink-3 focus:border-energy">
+    </div>
+
+    {# Catégories : menu déroulant à cases à cocher + pastilles actives #}
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="relative" data-dropdown>
+        <button type="button" data-dropdown-button aria-expanded="false" aria-haspopup="dialog"
+                class="flex w-full items-center justify-between gap-2 rounded border border-line bg-white px-4 py-2.5 text-sm font-medium text-ink-2 transition-colors hover:border-ink-3 hover:text-ink md:w-auto">
+          Catégories
+          <span class="font-mono text-xs text-ink-3" data-dropdown-compteur>{{ selection|length }}/{{ categories|length }}</span>
+          <svg class="h-4 w-4 text-ink-3 transition-transform duration-200" data-dropdown-chevron viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div data-dropdown-panel role="dialog" aria-label="Filtrer par catégorie"
+             class="absolute left-0 z-50 mt-2 hidden w-72 rounded border border-line bg-white p-2 shadow-hover md:left-auto md:right-0">
+          <fieldset>
+            <legend class="sr-only">Catégories de documents</legend>
+            {% for cat in categories %}
+            <label class="flex cursor-pointer items-center gap-3 rounded px-2 py-2 transition-colors hover:bg-paper-2">
+              <input type="checkbox" name="categorie" value="{{ cat.code }}" {% if cat.code in selection %}checked{% endif %}
+                     class="peer sr-only" data-dropdown-checkbox>
+              <span class="flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-ink-3 bg-white transition-colors peer-checked:border-energy peer-checked:bg-energy" aria-hidden="true">
+                <svg class="h-3 w-3 text-paper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </span>
+              <span class="h-2 w-2 shrink-0 rounded-full {{ cat.dot }}" aria-hidden="true"></span>
+              <span class="min-w-0 flex-1 truncate text-sm text-ink">{{ cat.label }}</span>
+              <span class="ml-auto font-mono text-xs text-ink-3">({{ cat.compteur }})</span>
+            </label>
+            {% endfor %}
+          </fieldset>
+          <div class="mt-1 flex items-center justify-between border-t border-line px-2 pt-2">
+            <button type="button" class="text-[13px] font-medium text-energy underline-offset-2 hover:underline" data-dropdown-tout>Tout cocher</button>
+            <button type="button" class="text-[13px] font-medium text-ink-3 underline-offset-2 hover:text-ink hover:underline" data-dropdown-rien>Tout décocher</button>
+          </div>
+        </div>
+      </div>
+
+      {# Pastilles des catégories cochées (quand la sélection est partielle) #}
+      {% if filtres_actifs %}
+        {% for cat in categories %}
+          {% if cat.code in selection %}
+          <span class="inline-flex items-center gap-1 rounded border px-2 py-1 font-mono text-[11px] uppercase tracking-[0.08em] {{ cat.tag }}">
+            {{ cat.short }}
+            <button type="button" data-retirer-categorie="{{ cat.code }}" aria-label="Retirer le filtre {{ cat.label }}"
+                    class="flex h-4 w-4 items-center justify-center rounded-full transition-colors hover:bg-ink/10">
+              <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </span>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {# Tri #}
+    <div class="relative">
+      <label for="tri-documents" class="sr-only">Trier les documents</label>
+      <select id="tri-documents" name="tri" data-auto-submit
+              class="w-full appearance-none rounded border border-line bg-white py-2.5 pl-3 pr-9 text-sm font-medium text-ink-2 md:w-auto">
+        <option value="recent" {% if tri == "recent" %}selected{% endif %}>Plus récents</option>
+        <option value="ancien" {% if tri == "ancien" %}selected{% endif %}>Plus anciens</option>
+        <option value="az" {% if tri == "az" %}selected{% endif %}>Nom A→Z</option>
+        <option value="za" {% if tri == "za" %}selected{% endif %}>Nom Z→A</option>
+      </select>
+      <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </form>
+</div>
+
+{# ============ Section 3 — Liste des documents ============ #}
+<section class="bg-paper py-10 md:py-14" aria-labelledby="titre-liste">
+  <div class="container-qd">
+    <h2 id="titre-liste" class="sr-only">Liste des documents</h2>
+
+    {% if total_publies == 0 %}
+    {# État vide absolu — aucun document publié #}
+    <div class="flex flex-col items-center rounded border border-dashed border-line bg-paper-2 p-10 text-center">
+      <svg class="h-10 w-10 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
+      <p class="mt-4 font-display text-lg font-medium text-ink">Les premiers documents seront publiés après la prochaine assemblée générale.</p>
+    </div>
+    {% else %}
+    {# Compteur de résultats + réinitialisation #}
+    <div class="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
+      <p class="font-mono text-[13px] text-ink-3" role="status">
+        {{ documents|length }} document{{ documents|length|pluralize }}{% if resume_filtres %} — {{ resume_filtres }}{% endif %}
+      </p>
+      {% if filtres_actifs %}
+      <a href="{% url 'library:document_list' %}" class="text-[13px] font-medium text-energy underline-offset-2 hover:underline">Réinitialiser les filtres</a>
+      {% endif %}
+    </div>
+
+    {% if documents %}
+    {# En-tête de liste (desktop) #}
+    <div class="hidden grid-cols-[minmax(0,1fr)_200px_130px_230px] gap-4 border-b border-line px-4 pb-2 md:grid" aria-hidden="true">
+      <span class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Document</span>
+      <span class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Catégorie</span>
+      <span class="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Date</span>
+      <span class="text-right font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Actions</span>
+    </div>
+    <ul class="border-t border-line md:border-t-0">
+      {% for doc in documents %}
+      <li class="group relative border-b border-line transition-colors hover:bg-paper-2">
+        <span class="absolute inset-y-0 left-0 w-0.5 bg-energy opacity-0 transition-opacity duration-200 group-hover:opacity-100" aria-hidden="true"></span>
+        <div class="grid grid-cols-1 gap-3 px-4 py-4 md:grid-cols-[minmax(0,1fr)_200px_130px_230px] md:items-center md:gap-4">
+          {# Icône + nom + méta #}
+          <div class="flex min-w-0 items-start gap-3">
+            <svg class="mt-0.5 h-[18px] w-[18px] shrink-0 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <div class="min-w-0">
+              <a href="{% url 'library:document_detail' pk=doc.pk %}" class="block truncate text-[15px] font-medium text-ink transition-colors after:absolute after:inset-0 hover:text-energy">{{ doc.title }}</a>
+              <p class="mt-0.5 font-mono text-xs text-ink-3">Ajouté le {{ doc.created_at|date_fr }} · PDF · {{ doc.file_size|taille_fichier }}</p>
+            </div>
+          </div>
+          {# Catégorie #}
+          <div>
+            <span class="inline-flex items-center gap-1 rounded border px-2 py-1 font-mono text-[11px] uppercase tracking-[0.08em] {{ doc.meta.tag }} md:hidden">{{ doc.meta.short }}</span>
+            <span class="hidden items-center gap-1 rounded border px-2 py-1 font-mono text-[11px] uppercase tracking-[0.08em] {{ doc.meta.tag }} md:inline-flex">{{ doc.meta.label }}</span>
+          </div>
+          {# Date #}
+          <p class="hidden font-mono text-[13px] text-ink-2 md:block">{{ doc.created_at|date_fr }}</p>
+          {# Actions (au-dessus du lien étiré) #}
+          <div class="relative z-10 flex items-center gap-2 md:justify-end">
+            <a href="{% url 'library:document_detail' pk=doc.pk %}" class="btn-quiet px-3 py-1.5">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              Voir
+            </a>
+            <a href="{% url 'download_file' kind='document' pk=doc.pk %}" download class="btn-quiet px-3 py-1.5" aria-label="Télécharger {{ doc.title }} (PDF, {{ doc.file_size|taille_fichier }})">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Télécharger
+            </a>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    {# Aucun résultat (filtres actifs) #}
+    <div class="flex flex-col items-center rounded border border-dashed border-line bg-white p-10 text-center">
+      <svg class="h-10 w-10 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
+      <p class="mt-4 font-display text-lg font-medium text-ink">Aucun document ne correspond à votre recherche.</p>
+      <a href="{% url 'library:document_list' %}" class="btn-quiet mt-5">Réinitialiser les filtres</a>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/filtres.js' %}" defer></script>
+{% endblock %}

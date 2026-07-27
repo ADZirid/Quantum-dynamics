@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+{% load format_fr %}
+{% block title %}Newsletter — Quantum Dynamics{% endblock %}
+{% block meta_description %}Chaque mois, le bureau de Quantum Dynamics publie une édition de la newsletter : activités, projets, coulisses des compétitions. Lisez-la en ligne ou téléchargez le PDF.{% endblock %}
+{% block content %}
+{# ============ Section 1 — En-tête ============ #}
+<section class="relative overflow-hidden border-b border-line bg-paper py-16 md:py-24">
+  <div class="absolute inset-0 opacity-[0.06]" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 512px 512px;" aria-hidden="true"></div>
+  <div class="container-qd relative">
+    <p class="label-mono text-energy">[ Newsletter ]</p>
+    <h1 class="mt-5 max-w-[16ch] font-display text-[40px] font-bold leading-[1.05] tracking-[-0.02em] text-ink md:text-[56px]">
+      Le journal de l'atelier
+    </h1>
+    <p class="mt-6 max-w-[62ch] text-[17px] leading-relaxed text-ink-2 md:text-xl">
+      Chaque mois, le bureau publie une édition : activités organisées, projets en cours,
+      coulisses des compétitions et toutes les informations de la vie associative.
+      Cliquez sur une édition pour la lire ici même, ou téléchargez-la.
+    </p>
+  </div>
+</section>
+
+{# ============ Section 2 — Édition à la une / état vide ============ #}
+{% if featured %}
+<section class="bg-paper py-16 md:py-24" aria-labelledby="titre-une">
+  <div class="container-qd">
+    <div class="grid gap-8 rounded border border-line bg-white p-6 md:p-8 lg:grid-cols-12">
+      {# Gauche — vignette « blueprint » (cliquable) #}
+      <div class="lg:col-span-5">
+        <figure>
+          <a href="{% url 'library:newsletter_detail' pk=featured.pk %}" class="block" aria-label="Lire {{ featured.title }} dans le navigateur">
+            <div class="relative flex aspect-[3/4] flex-col items-center justify-center gap-3 rounded border border-line bg-paper-2" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 256px 256px;" aria-hidden="true">
+              <span class="absolute left-3 top-3 h-4 w-4 border-l border-t border-ink-3/60"></span>
+              <span class="absolute right-3 top-3 h-4 w-4 border-r border-t border-ink-3/60"></span>
+              <span class="absolute bottom-3 left-3 h-4 w-4 border-b border-l border-ink-3/60"></span>
+              <span class="absolute bottom-3 right-3 h-4 w-4 border-b border-r border-ink-3/60"></span>
+              <svg class="h-10 w-10 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span class="max-w-[80%] truncate px-3 text-center font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Édition n°{{ featured.edition }}</span>
+            </div>
+          </a>
+        </figure>
+      </div>
+
+      {# Droite — métadonnées + actions #}
+      <div class="flex flex-col lg:col-span-7">
+        <p class="label-mono text-signal">[ Dernière édition ]</p>
+        <h2 id="titre-une" class="mt-3 font-display text-[24px] font-medium leading-snug tracking-[-0.02em] text-ink md:text-[28px]">
+          {{ featured.title }}
+        </h2>
+        <p class="mt-2 font-mono text-[13px] text-ink-3">Publiée le {{ featured.published_at|date_fr }}</p>
+        {% if featured.summary %}
+        <p class="mt-4 line-clamp-3 text-base leading-relaxed text-ink-2">{{ featured.summary }}</p>
+        {% endif %}
+        <p class="mt-4 font-mono text-xs uppercase tracking-[0.08em] text-ink-3">PDF · {{ featured.file_size|taille_fichier }}</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="{% url 'library:newsletter_detail' pk=featured.pk %}" class="btn-primary">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Lire dans le navigateur
+          </a>
+          <a href="{% url 'download_file' kind='newsletter' pk=featured.pk %}" download class="btn-secondary" aria-label="Télécharger {{ featured.title }} (PDF, {{ featured.file_size|taille_fichier }})">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Télécharger le PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% else %}
+{# État vide — aucune édition publiée #}
+<section class="bg-paper py-16 md:py-24">
+  <div class="container-qd">
+    <div class="mx-auto flex max-w-xl flex-col items-center rounded border border-line bg-paper-2 p-10 text-center">
+      <svg class="h-10 w-10 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+      <p class="mt-5 font-display text-xl font-medium tracking-[-0.02em] text-ink">La première édition arrive bientôt.</p>
+      <p class="mt-2 text-sm text-ink-3">La première édition est en cours de rédaction — revenez bientôt.</p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ============ Section 3 — Archives ============ #}
+{% if total_editions %}
+<section class="border-t border-line bg-paper pb-16 md:pb-24" aria-labelledby="titre-archives">
+  <div class="container-qd pt-16 md:pt-24">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="label-mono text-energy">[ Archives ]</p>
+        <h2 id="titre-archives" class="mt-4 font-display text-3xl font-bold tracking-[-0.02em] text-ink md:text-[40px]">Toutes les éditions</h2>
+      </div>
+      <p class="font-mono text-[13px] text-ink-3">{{ total_editions }} édition{{ total_editions|pluralize }} publiée{{ total_editions|pluralize }}</p>
+    </div>
+
+    {# Barre d'outils : recherche (client) + filtre année (GET) #}
+    <div class="mt-8 flex flex-col gap-3 border-b border-line pb-6 sm:flex-row sm:items-center">
+      <div class="relative flex-1">
+        <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <label for="recherche-edition" class="sr-only">Rechercher une édition</label>
+        <input id="recherche-edition" type="search" placeholder="Rechercher une édition…" data-recherche-input
+               class="w-full rounded border border-line bg-white py-2.5 pl-9 pr-3 text-sm text-ink placeholder:text-ink-3 focus:border-energy">
+      </div>
+      <form method="get" action="{% url 'library:newsletter_list' %}" class="relative">
+        <label for="filtre-annee" class="sr-only">Filtrer par année</label>
+        <select id="filtre-annee" name="annee" data-auto-submit
+                class="w-full appearance-none rounded border border-line bg-white py-2.5 pl-3 pr-9 text-sm font-medium text-ink-2 sm:w-auto">
+          <option value="">Toutes les années</option>
+          {% for annee in annees %}
+          <option value="{{ annee }}" {% if annee == annee_courante %}selected{% endif %}>{{ annee }}</option>
+          {% endfor %}
+        </select>
+        <svg class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </form>
+    </div>
+
+    {# Grille des éditions #}
+    <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {% for edition in page_obj %}
+      <article class="group relative flex flex-col rounded border border-line bg-white transition-[border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-energy hover:shadow-hover" data-recherche-item>
+        <div class="aspect-[4/3] overflow-hidden border-b border-line">
+          <div class="relative flex h-full w-full flex-col items-center justify-center gap-3 bg-paper-2 transition-transform duration-500 ease-out group-hover:scale-[1.02]" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 256px 256px;" aria-hidden="true">
+            <span class="absolute left-3 top-3 h-4 w-4 border-l border-t border-ink-3/60"></span>
+            <span class="absolute right-3 top-3 h-4 w-4 border-r border-t border-ink-3/60"></span>
+            <span class="absolute bottom-3 left-3 h-4 w-4 border-b border-l border-ink-3/60"></span>
+            <span class="absolute bottom-3 right-3 h-4 w-4 border-b border-r border-ink-3/60"></span>
+            <svg class="h-7 w-7 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span class="max-w-[80%] truncate px-3 text-center font-mono text-[11px] uppercase tracking-[0.08em] text-ink-3">Édition n°{{ edition.edition }}</span>
+          </div>
+        </div>
+        <div class="flex flex-1 flex-col p-5">
+          <p class="font-mono text-[11px] uppercase tracking-[0.08em] text-energy">Newsletter</p>
+          <h3 class="mt-2 font-display text-lg font-medium tracking-[-0.02em] text-ink">
+            <a href="{% url 'library:newsletter_detail' pk=edition.pk %}" class="after:absolute after:inset-0">{{ edition.title }}</a>
+          </h3>
+          <p class="mt-1 font-mono text-xs text-ink-3">{{ edition.published_at|date_fr }} · PDF · {{ edition.file_size|taille_fichier }}</p>
+          <div class="mt-4 flex items-center justify-between gap-2 border-t border-line pt-4">
+            <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-energy">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              Lire
+            </span>
+            <a href="{% url 'download_file' kind='newsletter' pk=edition.pk %}" download class="btn-quiet relative z-10 px-3 py-1.5" aria-label="Télécharger {{ edition.title }} (PDF, {{ edition.file_size|taille_fichier }})">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    {# Aucun résultat (recherche client) — affiché par filtres.js #}
+    <div class="mt-10 hidden flex-col items-center rounded border border-dashed border-line bg-white p-10 text-center" data-recherche-vide>
+      <svg class="h-8 w-8 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p class="mt-4 font-display text-lg font-medium text-ink">Aucune édition ne correspond à votre recherche.</p>
+      <button type="button" class="btn-quiet mt-5" data-recherche-reset>Réinitialiser les filtres</button>
+    </div>
+
+    {# Charger plus (pagination Django, 9 par page) #}
+    {% if page_obj.has_next %}
+    <div class="mt-10 text-center" data-recherche-pagination>
+      <a href="?page={{ page_obj.next_page_number }}{% if annee_courante %}&amp;annee={{ annee_courante }}{% endif %}" class="btn-quiet">
+        Charger plus d'éditions
+        <span class="font-mono text-xs text-ink-3">({{ restantes }} restante{{ restantes|pluralize }})</span>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/filtres.js' %}" defer></script>
+{% endblock %}

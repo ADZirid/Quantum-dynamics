@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Rejoindre l'association — Quantum Dynamics{% endblock %}
+
+{% block content %}
+<div class="grid min-h-[calc(100dvh-4rem)] bg-paper lg:grid-cols-12">
+  {# ============ Colonne gauche (7) — contenu + formulaire ============ #}
+  <div class="lg:col-span-7">
+    {# Aligné sur le container 1200px du site sur les très grands écrans #}
+    <div class="px-6 py-16 md:px-12 md:py-24 lg:pl-[max(3rem,calc((100vw-1200px)/2+3rem))] lg:pr-10">
+      <p class="label-mono text-energy">[ Nous rejoindre ]</p>
+      <h1 class="mt-5 font-display text-[36px] font-bold leading-[1.05] tracking-[-0.02em] text-ink md:text-[48px]">
+        Rejoignez l'atelier.
+      </h1>
+      <p class="mt-6 max-w-[58ch] text-[17px] leading-relaxed text-ink-2 md:text-xl">
+        Envie de concevoir, fabriquer et concourir avec nous ? Remplissez ce formulaire — le
+        bureau reçoit votre candidature par email et vous répond sous quelques jours. Toutes
+        les filières sont les bienvenues.
+      </p>
+
+      {% if sent %}
+        {# ---------- Panneau de confirmation ---------- #}
+        <div class="mt-10 max-w-[560px] rounded border border-ok bg-white p-8 text-center" role="status">
+          <svg viewBox="0 0 48 48" class="mx-auto h-16 w-16" fill="none" aria-hidden="true">
+            <circle cx="24" cy="24" r="22" stroke="#2E7D5B" stroke-width="2" />
+            <path d="M14 24.5 L21 31 L34 17.5" stroke="#2E7D5B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <h2 class="mt-6 font-display text-2xl font-medium tracking-[-0.02em] text-ink">
+            Candidature envoyée !
+          </h2>
+          <p class="mx-auto mt-4 max-w-[46ch] text-base leading-relaxed text-ink-2">
+            {% if sent.first_name %}Merci {{ sent.first_name }} ! {% endif %}Votre candidature a bien été transmise au bureau de
+            Quantum Dynamics.{% if sent.email %} Vous recevrez une réponse à l'adresse {{ sent.email }} sous quelques
+            jours.{% endif %}
+          </p>
+          <a href="{% url 'website:home' %}" class="btn-secondary mt-8">
+            Retour à l'accueil
+          </a>
+        </div>
+      {% else %}
+        {# ---------- Formulaire de candidature ---------- #}
+        <form class="mt-10 max-w-[560px] space-y-5" method="post" action="{% url 'website:rejoindre' %}" novalidate>
+          {% csrf_token %}
+
+          {% if rate_limited %}
+            <div class="rounded border border-danger bg-white p-4 text-sm leading-relaxed text-danger" role="alert">
+              Vous avez déjà envoyé plusieurs candidatures. Réessayez dans un moment.
+            </div>
+          {% endif %}
+
+          {# Nom + Prénom côte à côte (desktop) #}
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div class="group">
+              <label for="last_name" class="label-mono block text-ink-2 transition-colors duration-200 group-focus-within:text-energy">Nom</label>
+              <input
+                id="last_name"
+                name="last_name"
+                type="text"
+                autocomplete="family-name"
+                required
+                maxlength="80"
+                value="{{ values.last_name }}"
+                class="mt-2 w-full rounded border {% if errors.last_name %}border-danger{% else %}border-line{% endif %} bg-white px-[14px] py-3 text-base text-ink transition-colors placeholder:text-ink-3 focus:border-energy focus:outline-none focus:ring-2 focus:ring-energy/30"
+                {% if errors.last_name %}aria-invalid="true" aria-describedby="last_name-error"{% endif %}
+              >
+              {% if errors.last_name %}
+                <p id="last_name-error" class="mt-1.5 text-[13px] text-danger" role="alert">{{ errors.last_name }}</p>
+              {% endif %}
+            </div>
+            <div class="group">
+              <label for="first_name" class="label-mono block text-ink-2 transition-colors duration-200 group-focus-within:text-energy">Prénom</label>
+              <input
+                id="first_name"
+                name="first_name"
+                type="text"
+                autocomplete="given-name"
+                required
+                maxlength="80"
+                value="{{ values.first_name }}"
+                class="mt-2 w-full rounded border {% if errors.first_name %}border-danger{% else %}border-line{% endif %} bg-white px-[14px] py-3 text-base text-ink transition-colors placeholder:text-ink-3 focus:border-energy focus:outline-none focus:ring-2 focus:ring-energy/30"
+                {% if errors.first_name %}aria-invalid="true" aria-describedby="first_name-error"{% endif %}
+              >
+              {% if errors.first_name %}
+                <p id="first_name-error" class="mt-1.5 text-[13px] text-danger" role="alert">{{ errors.first_name }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          {# Email #}
+          <div class="group">
+            <label for="email" class="label-mono block text-ink-2 transition-colors duration-200 group-focus-within:text-energy">Email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              maxlength="254"
+              value="{{ values.email }}"
+              class="mt-2 w-full rounded border {% if errors.email %}border-danger{% else %}border-line{% endif %} bg-white px-[14px] py-3 text-base text-ink transition-colors placeholder:text-ink-3 focus:border-energy focus:outline-none focus:ring-2 focus:ring-energy/30"
+              {% if errors.email %}aria-invalid="true" aria-describedby="email-error"{% endif %}
+            >
+            {% if errors.email %}
+              <p id="email-error" class="mt-1.5 text-[13px] text-danger" role="alert">{{ errors.email }}</p>
+            {% endif %}
+          </div>
+
+          {# Études #}
+          <div class="group">
+            <label for="studies" class="label-mono block text-ink-2 transition-colors duration-200 group-focus-within:text-energy">Études</label>
+            <input
+              id="studies"
+              name="studies"
+              type="text"
+              required
+              maxlength="200"
+              placeholder="Ex. : BUT Génie Mécanique, 2ᵉ année"
+              value="{{ values.studies }}"
+              class="mt-2 w-full rounded border {% if errors.studies %}border-danger{% else %}border-line{% endif %} bg-white px-[14px] py-3 text-base text-ink transition-colors placeholder:text-ink-3 focus:border-energy focus:outline-none focus:ring-2 focus:ring-energy/30"
+              {% if errors.studies %}aria-invalid="true" aria-describedby="studies-error"{% endif %}
+            >
+            {% if errors.studies %}
+              <p id="studies-error" class="mt-1.5 text-[13px] text-danger" role="alert">{{ errors.studies }}</p>
+            {% endif %}
+          </div>
+
+          {# Motivation (facultative) #}
+          <div class="group">
+            <div class="flex items-baseline justify-between gap-4">
+              <label for="motivation" class="label-mono text-ink-2 transition-colors duration-200 group-focus-within:text-energy">
+                Pourquoi rejoindre l'association ?
+                <span class="normal-case text-ink-3">(facultatif)</span>
+              </label>
+              <span id="motivation-count" class="font-mono text-xs text-ink-3" aria-hidden="true">{{ values.motivation|length }}/1000</span>
+            </div>
+            <textarea
+              id="motivation"
+              name="motivation"
+              rows="5"
+              maxlength="1000"
+              class="mt-2 w-full resize-y rounded border {% if errors.motivation %}border-danger{% else %}border-line{% endif %} bg-white px-[14px] py-3 text-base text-ink transition-colors placeholder:text-ink-3 focus:border-energy focus:outline-none focus:ring-2 focus:ring-energy/30"
+              {% if errors.motivation %}aria-invalid="true" aria-describedby="motivation-error"{% endif %}
+            >{{ values.motivation }}</textarea>
+            {% if errors.motivation %}
+              <p id="motivation-error" class="mt-1.5 text-[13px] text-danger" role="alert">{{ errors.motivation }}</p>
+            {% endif %}
+          </div>
+
+          {# Honeypot invisible anti-bot — doit rester vide #}
+          <div class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+            <label for="website">Site web</label>
+            <input
+              id="website"
+              name="website"
+              type="text"
+              tabindex="-1"
+              autocomplete="off"
+            >
+          </div>
+
+          {# Consentement RGPD #}
+          <div>
+            <div class="flex items-start gap-3">
+              <input
+                id="consent"
+                name="consent"
+                type="checkbox"
+                required
+                {% if consent %}checked{% endif %}
+                class="mt-0.5 h-4 w-4 shrink-0 rounded border-line accent-energy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-energy"
+                {% if errors.consent %}aria-invalid="true" aria-describedby="consent-error"{% endif %}
+              >
+              <label for="consent" class="text-[13px] leading-relaxed text-ink-2">
+                J'accepte que mes informations soient transmises au bureau de Quantum Dynamics
+                pour traiter ma demande. Voir la
+                <a href="{% url 'website:politique_confidentialite' %}" class="font-medium text-energy underline underline-offset-2 transition-colors hover:text-energy-deep">
+                  politique de confidentialité
+                </a>
+                .
+              </label>
+            </div>
+            {% if errors.consent %}
+              <p id="consent-error" class="mt-1.5 text-[13px] text-danger" role="alert">{{ errors.consent }}</p>
+            {% endif %}
+          </div>
+
+          {# Bouton d'envoi #}
+          <div>
+            <button type="submit" class="btn-signal group w-full justify-center">
+              Envoyer ma candidature
+              <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+            <p class="mt-3 text-center font-mono text-xs text-ink-3">
+              Envoyé au bureau — quantumdynamics.asso@gmail.com
+            </p>
+          </div>
+        </form>
+      {% endif %}
+
+      {# ---------- Réseaux sociaux ---------- #}
+      <div class="mt-12 max-w-[560px] border-t border-line pt-6">
+        <p class="label-mono text-ink-2">Rejoins-nous aussi sur</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <a
+            href="https://www.instagram.com/quantum_dynamics.asso"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-quiet"
+            aria-label="Instagram de Quantum Dynamics"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            Instagram
+          </a>
+          <a
+            href="https://discord.gg/S9JsTSgbtk"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-quiet"
+            aria-label="Discord de Quantum Dynamics"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.058a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03ZM8.02 15.331c-1.182 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.157 2.418 0 1.334-.956 2.419-2.157 2.419Zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.095 2.157 2.418 0 1.334-.946 2.419-2.157 2.419Z"/></svg>
+            Discord
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ============ Colonne droite (5) — image pleine hauteur (cachée < 1024px) ============ #}
+  <div class="relative hidden border-l border-line lg:col-span-5 lg:block">
+    <figure class="sticky top-16 h-[calc(100dvh-4rem)]">
+      <img src="{% static 'illu/rejoindre-side.svg' %}" alt="De l'idée au prototype : parcours d'un projet d'atelier, style flat design" class="h-full w-full object-cover">
+      {# Croix de cadrage #}
+      <span class="absolute left-4 top-4 h-5 w-5 border-l border-t border-[#F2F1EC]/70" aria-hidden="true"></span>
+      <span class="absolute right-4 top-4 h-5 w-5 border-r border-t border-[#F2F1EC]/70" aria-hidden="true"></span>
+      <span class="absolute bottom-4 left-4 h-5 w-5 border-b border-l border-[#F2F1EC]/70" aria-hidden="true"></span>
+      <span class="absolute bottom-4 right-4 h-5 w-5 border-b border-r border-[#F2F1EC]/70" aria-hidden="true"></span>
+    </figure>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/rejoindre.js' %}" defer></script>
+{% endblock %}

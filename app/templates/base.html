@@ -1,0 +1,48 @@
+{% load static %}<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Quantum Dynamics — Association étudiante d'ingénierie{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Quantum Dynamics est une association étudiante qui conçoit et construit des prototypes dans les domaines des transports, de l'industrie et de l'énergie, puis les présente en compétitions d'ingénierie.{% endblock %}">
+  <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body class="bg-paper font-sans text-ink antialiased">
+
+  {# Menu mobile plein écran — élément DIRECT de <body> (évite le containing block créé par le backdrop-blur du header) : overlay opaque z-[100]. #}
+  <div id="mobile-menu" class="fixed inset-0 z-[100] hidden flex-col bg-paper" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+    <div class="container-qd flex h-16 items-center justify-between border-b border-line">
+      <span class="flex items-center gap-2.5 text-ink">
+        <img src="{% static 'img/logo-mark.png' %}" alt="" class="h-8 w-auto" width="26" height="32">
+        <span class="font-display text-[15px] font-semibold">Quantum Dynamics</span>
+      </span>
+      <button type="button" data-menu-close class="inline-flex h-10 w-10 items-center justify-center rounded border border-line text-ink" aria-label="Fermer le menu">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <nav class="container-qd flex flex-1 flex-col justify-center gap-6" aria-label="Navigation mobile">
+      <a href="{% url 'website:home' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Accueil</a>
+      <a href="{% url 'website:association' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/association/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">L'association</a>
+      <a href="{% url 'library:newsletter_list' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/newsletter/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Newsletter</a>
+      <a href="{% url 'library:document_list' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/documents/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Documents</a>
+      <a href="{% url 'website:rejoindre' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/rejoindre/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Rejoindre</a>
+      <a href="{% url 'accounts_app:login' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/espace-membres/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Espace membres</a>
+    </nav>
+  </div>
+
+  {% include "partials/navbar.html" %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/footer.html" %}
+
+  <script src="{% static 'js/menu.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

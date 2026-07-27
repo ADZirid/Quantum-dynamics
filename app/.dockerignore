@@ -1,0 +1,13 @@
+.git
+.gitignore
+node_modules
+__pycache__
+*.pyc
+db.sqlite3
+.secret_key
+staticfiles
+.env
+styles
+tailwind.django.config.js
+Dockerfile
+.dockerignore

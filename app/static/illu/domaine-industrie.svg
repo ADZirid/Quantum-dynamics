@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+ viewBox="0 0 400 300"
+ role="img"
+ aria-labelledby="dom-industrie-title"
+ preserveAspectRatio="xMidYMid meet"
+ >
+ <title id="dom-industrie-title">
+ Deux engrenages pleins en prise avec un écrou, style flat design
+ </title>
+ <rect width="400" height="300" fill="#EFEDE6" />
+ <rect x="36" y="30" width="328" height="240" rx="16" fill="#F7F6F2" />
+ <g fill="#161D1A">
+ <g>
+ <rect x="141" y="38" width="18" height="26" rx="4" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(45 150 130)" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(90 150 130)" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(135 150 130)" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(180 150 130)" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(225 150 130)" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(270 150 130)" />
+ <rect x="141" y="38" width="18" height="26" rx="4" transform="rotate(315 150 130)" />
+ </g>
+ <circle cx="150" cy="130" r="62" />
+ </g>
+ <circle cx="150" cy="130" r="26" fill="#EFEDE6" />
+ <circle cx="150" cy="130" r="10" fill="#1D7A5F" />
+ <g fill="#1D7A5F">
+ <g>
+ <rect x="275" y="132" width="14" height="20" rx="4" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(45 282 188)" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(90 282 188)" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(135 282 188)" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(180 282 188)" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(225 282 188)" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(270 282 188)" />
+ <rect x="275" y="132" width="14" height="20" rx="4" transform="rotate(315 282 188)" />
+ </g>
+ <circle cx="282" cy="188" r="42" />
+ </g>
+ <circle cx="282" cy="188" r="17" fill="#F7F6F2" />
+ <circle cx="282" cy="188" r="6" fill="#161D1A" />
+ <path
+ d="M 320 66 L 344 80 L 344 108 L 320 122 L 296 108 L 296 80 Z"
+ fill="#D08A2E"
+ />
+ <circle cx="320" cy="94" r="10" fill="#F7F6F2" />
+ <rect x="56" y="216" width="180" height="20" rx="10" fill="#161D1A" />
+ <circle cx="66" cy="226" r="15" fill="#161D1A" />
+ <circle cx="66" cy="226" r="6" fill="#EFEDE6" />
+ <circle cx="226" cy="226" r="15" fill="#161D1A" />
+ <circle cx="226" cy="226" r="6" fill="#EFEDE6" />
+ <circle cx="340" cy="240" r="9" fill="#D08A2E" />
+ </svg>

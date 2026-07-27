@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+ viewBox="0 0 400 300"
+ role="img"
+ aria-labelledby="dom-transports-title"
+ preserveAspectRatio="xMidYMid meet"
+ >
+ <title id="dom-transports-title">
+ Véhicule stylisé en aplats avec sa trajectoire, style flat design
+ </title>
+ <rect width="400" height="300" fill="#EFEDE6" />
+ <circle cx="200" cy="150" r="118" fill="#1D7A5F" />
+ <circle cx="200" cy="150" r="118" fill="none" stroke="#F7F6F2" stroke-width="6" />
+ <path
+ d="M -20 236 C 90 210 130 176 166 120 C 196 74 268 44 420 30
+ L 420 58 C 280 72 218 96 190 136 C 154 188 108 226 -20 262 Z"
+ fill="#F7F6F2"
+ />
+ <g>
+ <path
+ d="M 96 196
+ C 100 172 122 160 158 156
+ C 178 154 192 136 224 132
+ C 256 128 286 138 308 148
+ C 332 158 344 172 346 188
+ L 346 196
+ L 306 196
+ A 34 34 0 0 0 238 196
+ L 176 196
+ A 34 34 0 0 0 108 196
+ Z"
+ fill="#161D1A"
+ />
+ <path
+ d="M 214 138 C 244 134 272 142 292 150 L 284 166 L 220 166 Z"
+ fill="#F7F6F2"
+ />
+ <circle cx="338" cy="176" r="6" fill="#D08A2E" />
+ <circle cx="142" cy="196" r="28" fill="#161D1A" />
+ <circle cx="142" cy="196" r="12" fill="#F7F6F2" />
+ <circle cx="142" cy="196" r="5" fill="#D08A2E" />
+ <circle cx="272" cy="196" r="28" fill="#161D1A" />
+ <circle cx="272" cy="196" r="12" fill="#F7F6F2" />
+ <circle cx="272" cy="196" r="5" fill="#D08A2E" />
+ </g>
+ <rect x="34" y="150" width="42" height="10" rx="5" fill="#161D1A" />
+ <rect x="22" y="170" width="54" height="10" rx="5" fill="#161D1A" />
+ <rect x="38" y="190" width="34" height="10" rx="5" fill="#161D1A" />
+ </svg>

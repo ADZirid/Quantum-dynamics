@@ -1,0 +1,100 @@
+/**
+ * FIG. 04 — De l'idée au prototype : fusée et orbite en flat design
+ * sur fond sombre (rappel du logo). Planète energy, fusée claire pleine,
+ * anneau d'orbite, étoiles. Formes pleines uniquement.
+ */
+export default function RejoindreSide({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 600 800"
+      className={className}
+      role="img"
+      aria-labelledby="rejoindre-side-title"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      <title id="rejoindre-side-title">
+        Fusée stylisée en aplats clairs autour d'une planète avec son anneau
+        d'orbite
+      </title>
+
+      {/* Fond sombre */}
+      <rect width="600" height="800" fill="#161D1A" />
+
+      {/* Étoiles — pastilles et croix pleines */}
+      <g fill="#F2F1EC">
+        <circle cx="80" cy="90" r="5" />
+        <circle cx="520" cy="70" r="6" />
+        <circle cx="470" cy="210" r="4" />
+        <circle cx="60" cy="330" r="6" />
+        <circle cx="540" cy="420" r="5" />
+        <circle cx="110" cy="520" r="4" />
+        <circle cx="560" cy="620" r="5" />
+      </g>
+      <g fill="var(--energy)">
+        <path d="M 150 150 h 8 v -8 h 6 v 8 h 8 v 6 h -8 v 8 h -6 v -8 h -8 Z" />
+        <path d="M 500 320 h 8 v -8 h 6 v 8 h 8 v 6 h -8 v 8 h -6 v -8 h -8 Z" />
+        <path d="M 70 700 h 8 v -8 h 6 v 8 h 8 v 6 h -8 v 8 h -6 v -8 h -8 Z" />
+      </g>
+      <circle cx="430" cy="120" r="4" fill="var(--signal)" />
+      <circle cx="140" cy="430" r="4" fill="var(--signal)" />
+
+      {/* Planète — grand aplat energy avec cratères sombres, coupée en bas */}
+      <circle cx="300" cy="700" r="170" fill="var(--energy)" />
+      <circle cx="240" cy="650" r="26" fill="#161D1A" opacity="0.35" />
+      <circle cx="350" cy="730" r="18" fill="#161D1A" opacity="0.35" />
+      <circle cx="300" cy="680" r="10" fill="#161D1A" opacity="0.35" />
+
+      {/* Anneau d'orbite — bande claire pleine (evenodd) */}
+      <path
+        fill="#F2F1EC"
+        fillRule="evenodd"
+        transform="rotate(-18 300 700)"
+        d="M 300 552 a 260 88 0 1 1 -0.01 0 Z M 300 566 a 246 74 0 1 0 0.01 0 Z"
+      />
+      {/* La planète repasse devant la moitié basse de l'anneau */}
+      <path
+        d="M 130 700 a 170 170 0 0 0 340 0 Z"
+        fill="var(--energy)"
+        transform="rotate(0 300 700)"
+      />
+      <circle cx="240" cy="650" r="26" fill="#161D1A" opacity="0.35" />
+      <circle cx="300" cy="680" r="10" fill="#161D1A" opacity="0.35" />
+      {/* Satellite sur l'orbite */}
+      <circle cx="512" cy="596" r="12" fill="var(--signal)" />
+
+      {/* Fusée — groupe incliné, aplats pleins */}
+      <g transform="rotate(38 300 300)">
+        {/* Flamme — signal extérieur, clair intérieur */}
+        <path
+          d="M 300 452 C 282 420 282 396 300 372 C 318 396 318 420 300 452 Z"
+          fill="var(--signal)"
+        />
+        <path
+          d="M 300 428 C 291 410 291 398 300 384 C 309 398 309 410 300 428 Z"
+          fill="#F2F1EC"
+        />
+        {/* Ailerons signal */}
+        <path d="M 262 316 L 228 372 L 268 356 Z" fill="var(--signal)" />
+        <path d="M 338 316 L 372 372 L 332 356 Z" fill="var(--signal)" />
+        {/* Corps clair plein */}
+        <path
+          d="M 300 148
+             C 330 178 344 224 344 272
+             L 344 330
+             C 344 356 324 372 300 372
+             C 276 372 256 356 256 330
+             L 256 272
+             C 256 224 270 178 300 148 Z"
+          fill="#F2F1EC"
+        />
+        {/* Bande energy + hublot */}
+        <rect x="256" y="300" width="88" height="18" fill="var(--energy)" />
+        <circle cx="300" cy="240" r="24" fill="var(--energy)" />
+        <circle cx="300" cy="240" r="14" fill="#161D1A" />
+        <circle cx="294" cy="234" r="5" fill="#F2F1EC" />
+        {/* Nez signal */}
+        <path d="M 300 148 C 314 162 324 180 330 198 L 270 198 C 276 180 286 162 300 148 Z" fill="var(--signal)" />
+      </g>
+    </svg>
+  );
+}

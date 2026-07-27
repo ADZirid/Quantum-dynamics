@@ -1,0 +1,64 @@
+{% load static %}
+{# Footer fond encre — textes légaux repris mot pour mot de l'ancien Footer.tsx. #}
+<footer class="bg-ink text-[#F2F1EC]">
+  <div class="container-qd grid gap-12 py-16 md:grid-cols-3 md:gap-8">
+    {# Gauche — Légal #}
+    <div>
+      <p class="label-mono text-[11px] text-energy-light">Légal</p>
+      <ul class="mt-4 space-y-2">
+        <li>
+          <a href="{% url 'website:politique_confidentialite' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Politique de confidentialité</a>
+        </li>
+        <li>
+          <a href="{% url 'website:cgu' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Conditions générales d'utilisation</a>
+        </li>
+      </ul>
+      <address class="mt-6 space-y-1 font-mono text-xs not-italic text-ink-3">
+        <p>SIRET 993 125 129 00011</p>
+        <p>50 rue de Sèvres, 92410 Ville d'Avray</p>
+        <p>
+          <a href="mailto:quantumdynamics.asso@gmail.com" class="transition-colors hover:text-[#F2F1EC]">quantumdynamics.asso@gmail.com</a>
+        </p>
+      </address>
+    </div>
+
+    {# Centre — Navigation #}
+    <nav aria-label="Navigation de pied de page">
+      <p class="label-mono text-[11px] text-energy-light">Navigation</p>
+      <ul class="mt-4 space-y-2">
+        <li><a href="{% url 'website:home' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Accueil</a></li>
+        <li><a href="{% url 'website:association' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">L'association</a></li>
+        <li><a href="{% url 'library:newsletter_list' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Newsletter</a></li>
+        <li><a href="{% url 'library:document_list' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Documents</a></li>
+        <li><a href="{% url 'website:rejoindre' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Rejoindre</a></li>
+        <li><a href="{% url 'accounts_app:login' %}" class="text-sm text-[#9AA39E] underline-offset-4 transition-colors hover:text-[#F2F1EC] hover:underline">Espace membres</a></li>
+      </ul>
+    </nav>
+
+    {# Droite — Logo + baseline + réseaux #}
+    <div class="md:justify-self-end md:text-right">
+      <img src="{% static 'img/logo-full-light.png' %}" alt="Logo Quantum Dynamics" class="h-12 w-auto md:ml-auto" width="135" height="48">
+      <p class="mt-3 text-sm text-[#9AA39E]">Concevoir. Prototyper. Concourir.</p>
+
+      <p class="label-mono mt-8 text-[11px] text-energy-light">Suivez-nous</p>
+      <div class="mt-3 flex gap-3 md:justify-end">
+        <a href="https://www.instagram.com/quantum_dynamics.asso" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Quantum Dynamics" class="flex h-10 w-10 items-center justify-center rounded border border-line-dark text-[#9AA39E] transition-colors hover:border-[#F2F1EC] hover:text-[#F2F1EC]">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        </a>
+        <a href="https://discord.gg/S9JsTSgbtk" target="_blank" rel="noopener noreferrer" aria-label="Discord de Quantum Dynamics" class="flex h-10 w-10 items-center justify-center rounded border border-line-dark text-[#9AA39E] transition-colors hover:border-[#F2F1EC] hover:text-[#F2F1EC]">
+          {# Icône Discord inline — reprise de l'ancien DiscordIcon.tsx #}
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.59 5.89A16.13 16.13 0 0 0 14.5 4.6a.06.06 0 0 0-.06.03c-.19.34-.4.78-.55 1.13a14.9 14.9 0 0 0-3.78 0 11.3 11.3 0 0 0-.56-1.13.06.06 0 0 0-.06-.03 16.1 16.1 0 0 0-4.08 1.29.06.06 0 0 0-.03.02C2.68 9.7 1.97 13.4 2.29 17.06a.07.07 0 0 0 .03.05 16.23 16.23 0 0 0 4.9 2.47.06.06 0 0 0 .07-.02c.38-.52.72-1.06 1-1.63a.06.06 0 0 0-.03-.09 10.7 10.7 0 0 1-1.53-.73.06.06 0 0 1 0-.1c.1-.08.2-.16.3-.24a.06.06 0 0 1 .06 0 11.44 11.44 0 0 0 9.82 0 .06.06 0 0 1 .06 0c.1.08.2.16.3.24a.06.06 0 0 1 0 .1c-.48.28-.99.52-1.52.73a.06.06 0 0 0-.03.09c.28.57.62 1.11 1 1.63a.06.06 0 0 0 .07.02 16.16 16.16 0 0 0 4.9-2.47.06.06 0 0 0 .02-.05c.41-4.22-.68-7.88-2.9-11.15a.05.05 0 0 0-.02-.03Z"/>
+            <path d="M8.68 14.64c-.97 0-1.76-.89-1.76-1.98s.79-1.98 1.76-1.98c.98 0 1.77.9 1.76 1.98 0 1.09-.78 1.98-1.76 1.98Zm6.64 0c-.97 0-1.76-.89-1.76-1.98s.79-1.98 1.76-1.98c.98 0 1.77.9 1.76 1.98 0 1.09-.78 1.98-1.76 1.98Z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-line-dark">
+    <div class="container-qd py-6">
+      <p class="text-xs text-[#9AA39E]">© {% now "Y" %} Quantum Dynamics — Association étudiante d'ingénierie.</p>
+    </div>
+  </div>
+</footer>

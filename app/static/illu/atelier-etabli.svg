@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+ viewBox="0 0 960 400"
+ role="img"
+ aria-labelledby="atelier-title"
+ preserveAspectRatio="xMidYMid meet"
+ >
+ <title id="atelier-title">
+ Établi d'atelier stylisé en aplats clairs avec outils, lampe et
+ engrenage
+ </title>
+ <rect width="960" height="400" fill="#161D1A" />
+ <rect x="56" y="56" width="304" height="212" rx="12" fill="#F2F1EC" />
+ <g fill="#161D1A">
+ <circle cx="120" cy="116" r="24" />
+ <rect x="108" y="128" width="24" height="96" rx="12" />
+ <rect x="132" y="96" width="26" height="16" rx="8" transform="rotate(35 132 96)" />
+ </g>
+ <circle cx="120" cy="200" r="8" fill="#F2F1EC" />
+ <rect x="188" y="88" width="72" height="26" rx="10" fill="#1D7A5F" />
+ <rect x="216" y="110" width="16" height="112" rx="8" fill="#161D1A" />
+ <rect x="292" y="92" width="26" height="62" rx="13" fill="#D08A2E" />
+ <rect x="301" y="150" width="8" height="58" fill="#161D1A" />
+ <path d="M 297 208 L 313 208 L 305 226 Z" fill="#161D1A" />
+ <rect x="494" y="0" width="6" height="86" fill="#F2F1EC" />
+ <path d="M 462 86 L 534 86 L 556 140 L 440 140 Z" fill="#D08A2E" />
+ <circle cx="498" cy="152" r="12" fill="#F2F1EC" />
+ <rect x="56" y="288" width="848" height="22" rx="6" fill="#1D7A5F" />
+ <rect x="104" y="310" width="22" height="66" fill="#F2F1EC" />
+ <rect x="834" y="310" width="22" height="66" fill="#F2F1EC" />
+ <rect x="104" y="340" width="752" height="12" rx="6" fill="#F2F1EC" />
+ <rect x="196" y="322" width="90" height="54" rx="6" fill="#D08A2E" />
+ <rect x="228" y="312" width="26" height="12" rx="6" fill="#D08A2E" />
+ <rect x="196" y="344" width="90" height="8" fill="#161D1A" />
+ <g fill="#F2F1EC">
+ <g>
+ <rect x="651" y="150" width="16" height="22" rx="4" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(45 659 208)" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(90 659 208)" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(135 659 208)" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(180 659 208)" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(225 659 208)" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(270 659 208)" />
+ <rect x="651" y="150" width="16" height="22" rx="4" transform="rotate(315 659 208)" />
+ </g>
+ <circle cx="659" cy="208" r="46" />
+ </g>
+ <circle cx="659" cy="208" r="18" fill="#161D1A" />
+ <circle cx="659" cy="208" r="7" fill="#1D7A5F" />
+ <rect x="756" y="262" width="96" height="16" rx="4" fill="#F2F1EC" />
+ <rect x="764" y="244" width="80" height="16" rx="4" fill="#D08A2E" />
+ <rect x="772" y="226" width="64" height="16" rx="4" fill="#F2F1EC" />
+ <rect x="556" y="252" width="34" height="36" rx="6" fill="#1D7A5F" />
+ <path
+ d="M 590 258 C 606 258 606 280 590 280 L 590 272 C 597 272 597 266 590 266 Z"
+ fill="#1D7A5F"
+ />
+ <circle cx="908" cy="84" r="6" fill="#F2F1EC" />
+ <circle cx="884" cy="120" r="4" fill="#D08A2E" />
+ <circle cx="420" cy="208" r="5" fill="#F2F1EC" />
+ </svg>
