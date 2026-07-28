@@ -1,14 +1,21 @@
 """Vercel Serverless Function — Django WSGI adapter."""
 import os
 import sys
+import glob
 from io import BytesIO
 
 PROJECT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 APP_DIR = os.path.join(PROJECT_ROOT, "app")
-VENV_SITE = os.path.join(PROJECT_ROOT, ".venv", "lib", "python3.12", "site-packages")
 
-if os.path.isdir(VENV_SITE):
-    sys.path.insert(0, VENV_SITE)
+# Trouver le venv site-packages (python3.9 ou 3.12)
+venv_patterns = [
+    os.path.join(PROJECT_ROOT, ".venv", "lib", "python3.*", "site-packages"),
+]
+for pattern in venv_patterns:
+    for path in glob.glob(pattern):
+        if os.path.isdir(path):
+            sys.path.insert(0, path)
+
 sys.path.insert(0, APP_DIR)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
