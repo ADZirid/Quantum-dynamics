@@ -11,7 +11,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 from django.core.wsgi import get_wsgi_application
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 
-_django_app = StaticFilesHandler(get_wsgi_application())
+app = StaticFilesHandler(get_wsgi_application())
 
 
 def handler(request):
@@ -48,7 +48,7 @@ def handler(request):
         resp_headers[:] = response_headers
 
     try:
-        response_body = b"".join(_django_app(environ, start_response))
+        response_body = b"".join(app(environ, start_response))
     except Exception as e:
         return {
             "statusCode": 500,
