@@ -3,7 +3,10 @@ set -e
 
 cd app
 
-# Installer les dépendances
+# Créer un environnement virtuel
+uv venv
+
+# Installer les dépendances dans le venv
 uv pip install -r requirements.txt
 
 # Collecter les fichiers statiques

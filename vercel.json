@@ -1,6 +1,6 @@
 {
+  "installCommand": "uv venv && uv pip install -r app/requirements.txt",
   "buildCommand": "bash app/build.sh",
-  "installCommand": "uv pip install --system -r app/requirements.txt",
   "outputDirectory": ".",
   "routes": [
     {
