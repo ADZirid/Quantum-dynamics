@@ -1,18 +1,4 @@
 {
   "installCommand": "uv venv && uv pip install -r app/requirements.txt",
-  "buildCommand": "bash app/build.sh",
-  "outputDirectory": ".",
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/app/staticfiles/static/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index"
-    }
-  ]
+  "buildCommand": "bash app/build.sh"
 }
