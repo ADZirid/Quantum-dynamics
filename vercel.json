@@ -1,4 +1,9 @@
 {
   "installCommand": "uv venv .venv --python 3.12 && uv pip install -r requirements.txt",
-  "buildCommand": "bash app/build.sh"
+  "buildCommand": "bash app/build.sh",
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 30
+    }
+  }
 }

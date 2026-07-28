@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
+VENV_PYTHON="$(pwd)/.venv/bin/python"
+
 cd app
 
-# Utiliser uv run qui trouve automatiquement le venv
-uv run python manage.py collectstatic --noinput
-uv run python manage.py migrate --noinput
+"$VENV_PYTHON" manage.py collectstatic --noinput
+"$VENV_PYTHON" manage.py migrate --noinput
