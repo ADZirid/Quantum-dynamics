@@ -18,5 +18,8 @@ urlpatterns = [
     path("admin/membres/nouveau/", views.member_create, name="member_create"),
     path("admin/membres/<int:pk>/modifier/", views.member_update, name="member_update"),
     path("admin/membres/<int:pk>/supprimer/", views.member_delete, name="member_delete"),
+    path("admin/utilisateurs/nouveau/", views.user_create, name="user_create"),
+    path("admin/utilisateurs/<int:pk>/supprimer/", views.user_delete, name="user_delete"),
+    path("admin/utilisateurs/<int:pk>/reinitialiser-mot-de-passe/", views.user_reset_password, name="user_reset_password"),
     path("admin/securite/mot-de-passe/", views.password_change, name="password_change"),
 ]

@@ -12,7 +12,7 @@ Sécurité :
 from uuid import uuid4
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth import authenticate, get_user_model, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
@@ -23,13 +23,15 @@ from django.views.decorators.http import require_POST
 from core.models import Application, Document, Member, Newsletter
 from core.ratelimit import client_ip, consume
 
+User = get_user_model()
+
 GENERIC_ERROR = "Identifiant ou mot de passe incorrect."
 LOCKED_ERROR = "Trop de tentatives, réessayez dans quelques minutes."
 
 MAX_PDF_SIZE = 15 * 1024 * 1024  # 15 Mo
 PDF_MAGIC = b"%PDF-"
 
-VALID_TABS = {"overview", "newsletter", "documents", "candidatures", "bureau", "securite"}
+VALID_TABS = {"overview", "newsletter", "documents", "candidatures", "bureau", "utilisateurs", "securite"}
 
 
 # ---------------------------------------------------------------------------
@@ -138,6 +140,7 @@ def dashboard(request):
             ("documents", "Documents"),
             ("candidatures", "Candidatures"),
             ("bureau", "Bureau & membres"),
+            ("utilisateurs", "Utilisateurs"),
             ("securite", "Sécurité"),
         ],
         "counts": {
@@ -156,6 +159,7 @@ def dashboard(request):
         "candidature_statuses": Application.Status.choices,
         "filtre_statut": request.GET.get("statut", ""),
         "membres": Member.objects.all(),
+        "utilisateurs": User.objects.all().order_by("-is_staff", "username"),
         "password_form": PasswordChangeForm(request.user),
     }
 
@@ -378,6 +382,73 @@ def member_delete(request, pk):
     member.delete()
     messages.success(request, f"Membre « {nom} » supprimé.")
     return redirect(_dashboard_url("bureau"))
+
+
+# --- Utilisateurs ------------------------------------------------------------
+
+@login_required
+@require_POST
+def user_create(request):
+    """Créer un nouveau compte staff."""
+    username = request.POST.get("username", "").strip()
+    email = request.POST.get("email", "").strip()
+    password = request.POST.get("password", "")
+
+    if not username or not password:
+        messages.error(request, "Identifiant et mot de passe sont obligatoires.")
+        return redirect(_dashboard_url("utilisateurs"))
+    if len(password) < 12:
+        messages.error(request, "Le mot de passe doit contenir au moins 12 caractères.")
+        return redirect(_dashboard_url("utilisateurs"))
+    if User.objects.filter(username=username).exists():
+        messages.error(request, f"Le nom d'utilisateur « {username} » existe déjà.")
+        return redirect(_dashboard_url("utilisateurs"))
+
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password,
+        is_staff=True,
+    )
+    messages.success(request, f"Compte staff « {username} » créé avec succès.")
+    return redirect(_dashboard_url("utilisateurs"))
+
+
+@login_required
+@require_POST
+def user_delete(request, pk):
+    """Supprimer un compte staff (pas soi-même)."""
+    user_to_delete = get_object_or_404(User, pk=pk)
+    if user_to_delete.pk == request.user.pk:
+        messages.error(request, "Vous ne pouvez pas supprimer votre propre compte.")
+        return redirect(_dashboard_url("utilisateurs"))
+    if not user_to_delete.is_staff:
+        messages.error(request, "Ce compte n'est pas un compte staff.")
+        return redirect(_dashboard_url("utilisateurs"))
+    username = user_to_delete.username
+    user_to_delete.delete()
+    messages.success(request, f"Compte « {username} » supprimé.")
+    return redirect(_dashboard_url("utilisateurs"))
+
+
+@login_required
+@require_POST
+def user_reset_password(request, pk):
+    """Réinitialiser le mot de passe d'un compte staff."""
+    user_to_reset = get_object_or_404(User, pk=pk)
+    new_password = request.POST.get("new_password", "")
+
+    if not user_to_reset.is_staff:
+        messages.error(request, "Ce compte n'est pas un compte staff.")
+        return redirect(_dashboard_url("utilisateurs"))
+    if len(new_password) < 12:
+        messages.error(request, "Le mot de passe doit contenir au moins 12 caractères.")
+        return redirect(_dashboard_url("utilisateurs"))
+
+    user_to_reset.set_password(new_password)
+    user_to_reset.save()
+    messages.success(request, f"Mot de passe de « {user_to_reset.username } » réinitialisé.")
+    return redirect(_dashboard_url("utilisateurs"))
 
 
 # --- Sécurité ---------------------------------------------------------------

@@ -398,6 +398,71 @@
         {% endif %}
       </section>
 
+      {# ================= Utilisateurs ================= #}
+      <section data-tab-panel="utilisateurs" {% if tab != 'utilisateurs' %}hidden{% endif %} aria-label="Utilisateurs">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Utilisateurs</h1>
+
+        <div class="mt-6 rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Créer un compte staff</h2>
+          <form method="post" action="{% url 'accounts_app:user_create' %}" class="mt-4 space-y-4">
+            {% csrf_token %}
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="usr-username" class="label-mono block text-ink-2">Identifiant</label>
+                <input id="usr-username" name="username" type="text" required maxlength="150" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="usr-email" class="label-mono block text-ink-2">Email (optionnel)</label>
+                <input id="usr-email" name="email" type="email" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label for="usr-password" class="label-mono block text-ink-2">Mot de passe (12 caractères min.)</label>
+              <input id="usr-password" name="password" type="password" required minlength="12" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+            </div>
+            <button type="submit" class="btn-primary">Créer le compte</button>
+          </form>
+        </div>
+
+        <h2 class="mt-8 font-display text-lg font-medium text-ink">Comptes staff</h2>
+        {% if utilisateurs %}
+        <ul class="mt-4 divide-y divide-line rounded border border-line bg-white">
+          {% for usr in utilisateurs %}
+          <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <div class="flex items-center gap-3">
+              <span class="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-paper-2 font-mono text-xs font-semibold uppercase text-ink-3">{{ usr.username|slice:":1" }}</span>
+              <div>
+                <p class="text-sm font-medium text-ink">{{ usr.username }}</p>
+                <p class="text-[13px] text-ink-3">{% if usr.email %}{{ usr.email }} · {% endif %}{% if usr.is_staff %}<span class="text-energy">Staff</span>{% else %}Utilisateur{% endif %}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <details class="relative">
+                <summary class="cursor-pointer text-[13px] font-medium text-ink-2 transition-colors hover:text-ink">Réinitialiser le mot de passe</summary>
+                <form method="post" action="{% url 'accounts_app:user_reset_password' usr.pk %}" class="absolute right-0 z-10 mt-2 w-72 rounded border border-line bg-white p-4 shadow-lg">
+                  {% csrf_token %}
+                  <div class="space-y-1.5">
+                    <label class="label-mono block text-ink-2">Nouveau mot de passe</label>
+                    <input name="new_password" type="password" required minlength="12" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                  <button type="submit" class="btn-primary mt-3 w-full justify-center">Réinitialiser</button>
+                </form>
+              </details>
+              {% if usr.pk != user.pk %}
+              <form method="post" action="{% url 'accounts_app:user_delete' usr.pk %}" data-confirm="Supprimer définitivement le compte « {{ usr.username }} » ?">
+                {% csrf_token %}
+                <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Supprimer</button>
+              </form>
+              {% endif %}
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucun compte pour le moment.</p>
+        {% endif %}
+      </section>
+
       {# ================= Sécurité ================= #}
       <section data-tab-panel="securite" {% if tab != 'securite' %}hidden{% endif %} aria-label="Sécurité">
         <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Sécurité</h1>
