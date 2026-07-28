@@ -8,9 +8,9 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: "false"
+        value: "true"
       - key: ALLOWED_HOSTS
-        value: ".onrender.com"
+        value: "*"
       - key: PYTHON_VERSION
         value: "3.12.0"
       - key: PYTHONPATH
