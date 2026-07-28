@@ -3,7 +3,7 @@ services:
     name: quantum-dynamics
     runtime: python
     buildCommand: cd app && pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: python -c "import os,sys;os.environ['DJANGO_SETTINGS_MODULE']='config.settings';sys.path.insert(0,'app');import django;django.setup();from django.core.management import call_command;call_command('migrate','--noinput')" && gunicorn config.wsgi:application -b 0.0.0.0:$PORT --pythonpath app
+    startCommand: bash start.sh
     envVars:
       - key: SECRET_KEY
         generateValue: true
