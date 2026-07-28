@@ -2,11 +2,6 @@
   "buildCommand": "bash app/build.sh",
   "installCommand": "uv pip install --system -r app/requirements.txt",
   "outputDirectory": "app/staticfiles",
-  "functions": {
-    "app/vercel_handler.py": {
-      "maxDuration": 30
-    }
-  },
   "routes": [
     {
       "src": "/static/(.*)",
@@ -14,7 +9,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/app/vercel_handler.py"
+      "dest": "/api/index.py"
     }
   ]
 }
