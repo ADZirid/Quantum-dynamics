@@ -3,7 +3,7 @@ services:
     name: quantum-dynamics
     runtime: python
     buildCommand: cd app && pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: cd app && python manage.py migrate --noinput && gunicorn config.wsgi:application -b 0.0.0.0:$PORT
+    startCommand: python -c "import os,sys;os.environ['DJANGO_SETTINGS_MODULE']='config.settings';sys.path.insert(0,'app');import django;django.setup();from django.core.management import call_command;call_command('migrate','--noinput')" && gunicorn config.wsgi:application -b 0.0.0.0:$PORT --pythonpath app
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -13,5 +13,3 @@ services:
         value: ".onrender.com"
       - key: PYTHON_VERSION
         value: "3.12.0"
-      - key: DATABASE_URL
-        value: "sqlite:////opt/render/project/src/app/db.sqlite3"
