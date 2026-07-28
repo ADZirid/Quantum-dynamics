@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+cd app
+
 # Installer les dépendances
 uv pip install --system -r requirements.txt
 
