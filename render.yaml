@@ -2,8 +2,8 @@ services:
   - type: web
     name: quantum-dynamics
     runtime: python
-    buildCommand: cd app && rm -f db.sqlite3 && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
-    startCommand: gunicorn config.wsgi:application -b 0.0.0.0:$PORT --pythonpath app
+    buildCommand: cd app && pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: cd app && python -c "import os;os.environ['DJANGO_SETTINGS_MODULE']='config.settings';import django;django.setup();from django.core.management import call_command;call_command('migrate','--noinput')" && cd app && gunicorn config.wsgi:application -b 0.0.0.0:$PORT
     envVars:
       - key: SECRET_KEY
         generateValue: true
