@@ -3,7 +3,7 @@ services:
     name: quantum-dynamics
     runtime: python
     buildCommand: pip install -r requirements.txt && python app/manage.py collectstatic --noinput && python app/manage.py migrate --noinput
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --chdir app
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --chdir /opt/render/project/src/app
     envVars:
       - key: SECRET_KEY
         generateValue: true
@@ -14,4 +14,4 @@ services:
       - key: PYTHON_VERSION
         value: "3.12.0"
       - key: PYTHONPATH
-        value: app
+        value: /opt/render/project/src/app
