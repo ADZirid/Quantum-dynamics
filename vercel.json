@@ -1,4 +1,3 @@
 {
-  "installCommand": "uv pip install --system -r app/requirements.txt",
   "buildCommand": "bash app/build.sh"
 }

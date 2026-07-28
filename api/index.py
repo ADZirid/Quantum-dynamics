@@ -3,7 +3,12 @@ import os
 import sys
 from io import BytesIO
 
-APP_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "app")
+PROJECT_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+APP_DIR = os.path.join(PROJECT_ROOT, "app")
+VENV_SITE = os.path.join(PROJECT_ROOT, ".venv", "lib", "python3.12", "site-packages")
+
+if os.path.isdir(VENV_SITE):
+    sys.path.insert(0, VENV_SITE)
 sys.path.insert(0, APP_DIR)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
