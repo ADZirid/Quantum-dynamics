@@ -2,8 +2,8 @@ services:
   - type: web
     name: quantum-dynamics
     runtime: python
-    buildCommand: cd app && pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: bash start.sh
+    buildCommand: pip install -r app/requirements.txt && PYTHONPATH=app python app/manage.py collectstatic --noinput && PYTHONPATH=app python app/manage.py migrate --noinput
+    startCommand: PYTHONPATH=app python app/manage.py migrate --noinput && gunicorn config.wsgi:application -b 0.0.0.0:$PORT --pythonpath app
     envVars:
       - key: SECRET_KEY
         generateValue: true
