@@ -1,8 +1,16 @@
 #!/bin/bash
 set -e
 
-cd /opt/render/project/src/app
+echo "=== STARTING ==="
+echo "CWD: $(pwd)"
+echo "DB path check:"
+ls -la app/db.sqlite3 2>&1 || echo "No DB found"
 
-python manage.py migrate --noinput
+echo "=== Running migrate ==="
+python app/manage.py migrate --noinput
 
-exec gunicorn config.wsgi:application -b 0.0.0.0:$PORT --workers 2 --timeout 60
+echo "=== Checking DB after migrate ==="
+python app/manage.py showmigrations --list 2>&1 | head -20
+
+echo "=== Starting gunicorn ==="
+exec gunicorn config.wsgi:application -b 0.0.0.0:$PORT --pythonpath app
