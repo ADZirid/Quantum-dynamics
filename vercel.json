@@ -3,6 +3,7 @@
   "buildCommand": "bash app/build.sh",
   "functions": {
     "api/index.py": {
+      "runtime": "@vercel/python@3.12",
       "maxDuration": 30
     }
   }
