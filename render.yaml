@@ -2,8 +2,8 @@ services:
   - type: web
     name: quantum-dynamics
     runtime: python
-    buildCommand: cd app && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
-    startCommand: cd app && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    dockerfilePath: ./app/Dockerfile
+    dockerContext: ./app
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
