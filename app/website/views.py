@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.shortcuts import render
+from django.utils import timezone
 
 from core.models import Application, Member, Newsletter
 from core.ratelimit import client_ip, consume
@@ -138,6 +139,8 @@ def rejoindre(request):
             email=values["email"],
             studies=values["studies"],
             motivation=values["motivation"],
+            consent_at=timezone.now(),
+            consent_ip=ip,
             status=Application.Status.NOUVEAU,
         )
         # Notification au bureau — fail_silently : l'envoi ne doit jamais

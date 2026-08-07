@@ -128,6 +128,24 @@ STORAGES = {
     },
 }
 
+# --- Stockage des fichiers (FileField : disque local en dev, S3/R2 en prod) --
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
+
+if os.environ.get("FILE_STORAGE", "local") == "s3":
+    # Object storage compatible S3 (ex. Cloudflare R2, Backblaze B2).
+    STORAGES["default"] = {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}
+    AWS_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("R2_BUCKET", "")
+    AWS_S3_ENDPOINT_URL = os.environ.get("R2_ENDPOINT", "")
+    AWS_S3_REGION_NAME = os.environ.get("R2_REGION", "auto")
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_S3_ADDRESSING_STYLE = "path"
+    # Les fichiers sont servis via les vues Django (serve_file/download_file) :
+    # le bucket reste privé.
+    AWS_QUERYSTRING_AUTH = False
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- Sécurité (exigences client) -------------------------------------------
@@ -174,3 +192,14 @@ NOTIFY_EMAIL = os.environ.get("NOTIFY_EMAIL", "quantumdynamics.asso@gmail.com")
 LOGIN_URL = "/espace-membres/"
 LOGIN_REDIRECT_URL = "/admin/"
 LOGOUT_REDIRECT_URL = "/"
+
+# --- RGPD ----------------------------------------------------------------------
+# Durée de conservation des candidatures (12 mois, cf. politique de confidentialité).
+APPLICATION_RETENTION_DAYS = int(os.environ.get("APPLICATION_RETENTION_DAYS", "365"))
+# Durée de conservation des compteurs de rate-limiting (IP adresses).
+RATELIMIT_RETENTION_DAYS = int(os.environ.get("RATELIMIT_RETENTION_DAYS", "30"))
+
+# Sessions courtes : le cookie expire à la fermeture du navigateur, sinon après
+# 24 h d'inactivité (aligné sur la politique : « durée de la session uniquement »).
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 60 * 60 * 24  # 24 h

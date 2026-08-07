@@ -6,10 +6,11 @@ Sécurité :
 - toutes les vues du dashboard derrière @login_required, mutations en POST
   uniquement avec CSRF natif Django ;
 - uploads PDF validés côté serveur (extension, magic bytes %PDF-, 15 Mo max),
-  nom de fichier régénéré (uuid4), contenu stocké en BinaryField ;
+  nom de fichier régénéré (uuid4), contenu stocké via FileField ;
 - aucun filtre |safe sur des données utilisateur côté templates.
 """
-from uuid import uuid4
+import csv
+import io
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout, update_session_auth_hash
@@ -17,6 +18,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -81,7 +83,9 @@ def _dashboard_url(tab: str) -> str:
 def _validate_pdf(upload):
     """Validation stricte d'un PDF uploadé.
 
-    Retourne (données_binaires, message_erreur). L'une des deux valeurs est None.
+    Lit uniquement les 5 premiers octets (magic bytes %PDF-) puis restaure le
+    pointeur de lecture. Retourne (None, message_erreur). Le contenu n'est pas
+    lu en mémoire : le fichier est stocké directement via le FileField.
     """
     if upload is None:
         return None, "Veuillez joindre un fichier PDF."
@@ -89,14 +93,12 @@ def _validate_pdf(upload):
         return None, "Le fichier dépasse la taille maximale autorisée (15 Mo)."
     if not upload.name.lower().endswith(".pdf"):
         return None, "Le fichier n'est pas un PDF valide."
-    data = upload.read()
-    if not data.startswith(PDF_MAGIC):
+    upload.seek(0)
+    if upload.file.read(len(PDF_MAGIC)) != PDF_MAGIC:
+        upload.file.seek(0)
         return None, "Le fichier n'est pas un PDF valide."
-    return data, None
-
-
-def _stored_file_name() -> str:
-    return f"{uuid4().hex}.pdf"
+    upload.file.seek(0)
+    return None, None
 
 
 def _validate_photo_url(raw: str):
@@ -196,21 +198,22 @@ def newsletter_create(request):
         messages.error(request, "Le numéro d'édition doit être un entier positif.")
         return redirect(_dashboard_url("newsletter"))
 
-    data, error = _validate_pdf(request.FILES.get("file"))
+    _, error = _validate_pdf(request.FILES.get("file"))
     if error:
         messages.error(request, error)
         return redirect(_dashboard_url("newsletter"))
 
     try:
-        Newsletter.objects.create(
+        upload = request.FILES.get("file")
+        newsletter = Newsletter(
             title=title,
             edition=edition,
             summary=summary,
             published_at=published_at,
-            file_name=_stored_file_name(),
-            file_data=data,
-            file_size=len(data),
+            file=upload,
+            file_size=upload.size,
         )
+        newsletter.save()
     except (ValueError, ValidationError):
         messages.error(request, "La date de publication est invalide.")
         return redirect(_dashboard_url("newsletter"))
@@ -244,18 +247,18 @@ def document_create(request):
         messages.error(request, "La catégorie est invalide.")
         return redirect(_dashboard_url("documents"))
 
-    data, error = _validate_pdf(request.FILES.get("file"))
+    _, error = _validate_pdf(request.FILES.get("file"))
     if error:
         messages.error(request, error)
         return redirect(_dashboard_url("documents"))
 
+    upload = request.FILES.get("file")
     Document.objects.create(
         title=title,
         category=category,
         description=description,
-        file_name=_stored_file_name(),
-        file_data=data,
-        file_size=len(data),
+        file=upload,
+        file_size=upload.size,
     )
     messages.success(request, f"Document « {title} » ajouté.")
     return redirect(_dashboard_url("documents"))
@@ -315,6 +318,83 @@ def application_status(request, pk):
     filtre = request.POST.get("filtre", "")
     suffix = f"&statut={filtre}" if filtre in Application.Status.values else ""
     return redirect(_dashboard_url("candidatures") + suffix)
+
+
+@login_required
+def application_export(request):
+    """Export CSV (UTF-8 BOM) des candidatures, filtrées comme sur le dashboard.
+
+    Droits RGPD : accès et portabilité. GET uniquement (lecture seule).
+    """
+    filtre = request.GET.get("statut", "")
+    applications = Application.objects.all().order_by("-created_at")
+    if filtre in Application.Status.values:
+        applications = applications.filter(status=filtre)
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow([
+        "Prénom", "Nom", "Email", "Études", "Motivation",
+        "Statut", "Date", "Consentement", "IP consentement",
+    ])
+    for app in applications:
+        writer.writerow([
+            app.first_name,
+            app.last_name,
+            app.email,
+            app.studies,
+            app.motivation,
+            app.get_status_display(),
+            app.created_at.strftime("%d/%m/%Y %H:%M") if app.created_at else "",
+            app.consent_at.strftime("%d/%m/%Y %H:%M") if app.consent_at else "",
+            app.consent_ip or "",
+        ])
+
+    response = HttpResponse(
+        "\ufeff" + buffer.getvalue(), content_type="text/csv; charset=utf-8"
+    )
+    response["Content-Disposition"] = "attachment; filename=candidatures.csv"
+    return response
+
+
+@login_required
+@require_POST
+def application_delete(request, pk):
+    """Effacement d'une candidature (droit RGPD à l'effacement)."""
+    application = get_object_or_404(Application, pk=pk)
+    nom = f"{application.first_name} {application.last_name}"
+    application.delete()
+    messages.success(request, f"Candidature de {nom} supprimée.")
+    filtre = request.POST.get("filtre", "")
+    suffix = f"&statut={filtre}" if filtre in Application.Status.values else ""
+    return redirect(_dashboard_url("candidatures") + suffix)
+
+
+@login_required
+@require_POST
+def application_purge(request):
+    """Purge RGPD : supprime les candidatures plus vieilles que la durée de
+    conservation (settings.APPLICATION_RETENTION_DAYS) et les compteurs de
+    rate-limiting expirés."""
+    from datetime import timedelta
+
+    from django.conf import settings as dj_settings
+    from django.utils import timezone as dj_timezone
+
+    from core.models import RateLimitEntry
+
+    limite = dj_timezone.now() - timedelta(days=dj_settings.APPLICATION_RETENTION_DAYS)
+    deleted = Application.objects.filter(created_at__lt=limite).delete()
+    n = deleted[1].get("core.Application", 0) if isinstance(deleted, tuple) else deleted
+    RateLimitEntry.objects.filter(
+        window_start__lt=dj_timezone.now()
+        - timedelta(days=dj_settings.RATELIMIT_RETENTION_DAYS)
+    ).delete()
+    messages.success(
+        request,
+        f"{n} candidature(s) de plus de {dj_settings.APPLICATION_RETENTION_DAYS} jours supprimée(s).",
+    )
+    return redirect(_dashboard_url("candidatures"))
 
 
 # --- Bureau / membres -------------------------------------------------------

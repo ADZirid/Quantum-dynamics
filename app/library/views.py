@@ -63,7 +63,7 @@ EDITIONS_PAR_PAGE = 9
 
 def newsletter_list(request):
     """Journal de l'atelier : une à la une + grille d'archives."""
-    editions = Newsletter.objects.defer("file_data")
+    editions = Newsletter.objects.all()
     featured = editions.first()
 
     annee_param = request.GET.get("annee", "").strip()
@@ -91,7 +91,7 @@ def newsletter_list(request):
 
 def newsletter_detail(request, pk: int):
     """Lecteur d'édition : barre d'outils sticky + iframe PDF + nav prev/next."""
-    edition = Newsletter.objects.defer("file_data").filter(pk=pk).first()
+    edition = Newsletter.objects.filter(pk=pk).first()
     if edition is None:
         return render(
             request,
@@ -102,7 +102,7 @@ def newsletter_detail(request, pk: int):
 
     # Précédente = plus ancienne, suivante = plus récente (même convention que
     # l'ancien site : liste triée de la plus récente à la plus ancienne).
-    nav = list(Newsletter.objects.defer("file_data"))
+    nav = list(Newsletter.objects.all())
     index = next((i for i, n in enumerate(nav) if n.pk == edition.pk), -1)
     precedente = nav[index + 1] if 0 <= index < len(nav) - 1 else None
     suivante = nav[index - 1] if index > 0 else None
@@ -140,7 +140,7 @@ def document_list(request):
         for row in Document.objects.values("category").annotate(n=Count("pk"))
     }
 
-    documents = Document.objects.defer("file_data")
+    documents = Document.objects.all()
     if soumis and not selection:
         documents = documents.none()
     elif selection and set(selection) != set(tous_les_codes):
@@ -186,7 +186,7 @@ def document_list(request):
 
 def document_detail(request, pk: int):
     """Lecteur de document : même shell que la newsletter + tag catégorie."""
-    document = Document.objects.defer("file_data").filter(pk=pk).first()
+    document = Document.objects.filter(pk=pk).first()
     if document is None:
         return render(
             request,

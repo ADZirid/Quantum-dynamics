@@ -250,6 +250,17 @@
           <button type="submit" class="btn-quiet">Filtrer</button>
         </form>
 
+        {# Actions RGPD : export (portabilité) + purge (conservation 12 mois) #}
+        <div class="mt-3 flex flex-wrap items-center gap-3">
+          <a href="{% url 'accounts_app:application_export' %}{% if filtre_statut %}?statut={{ filtre_statut }}{% endif %}" class="btn-quiet">
+            Exporter en CSV
+          </a>
+          <form method="post" action="{% url 'accounts_app:application_purge' %}" data-confirm="Supprimer définitivement toutes les candidatures de plus de 12 mois ?">
+            {% csrf_token %}
+            <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Purger les candidatures de plus de 12 mois</button>
+          </form>
+        </div>
+
         {% if candidatures %}
         <div class="mt-4 overflow-x-auto rounded border border-line bg-white">
           <table class="w-full min-w-[640px] text-left text-sm">
@@ -281,6 +292,11 @@
                       {% endfor %}
                     </select>
                     <button type="submit" class="btn-quiet">Mettre à jour</button>
+                  </form>
+                  <form method="post" action="{% url 'accounts_app:application_delete' candidature.pk %}" class="mt-2" data-confirm="Supprimer définitivement la candidature de {{ candidature.first_name }} {{ candidature.last_name }} ?">
+                    {% csrf_token %}
+                    <input type="hidden" name="filtre" value="{{ filtre_statut }}">
+                    <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Supprimer</button>
                   </form>
                 </td>
               </tr>

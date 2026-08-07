@@ -1,10 +1,18 @@
 """Modèles de données — Quantum Dynamics.
 
 TOUS les modèles du site vivent ici (contrat GELÉ pour les agents suivants).
-Les fichiers PDF (documents, newsletters) sont stockés en base via BinaryField
+Les fichiers PDF (documents, newsletters) sont stockés via un FileField
+(stockage interchangeable : disque local en dev / objet S3-compatible en prod)
 et servis en streaming par core.views.serve_file.
 """
+import uuid
+
 from django.db import models
+
+
+def _pdf_upload_to(instance, filename):
+    """Nom de fichier régénéré (uuid4) pour éviter collisions et injections."""
+    return f"pdf/{uuid.uuid4().hex}.pdf"
 
 
 class Member(models.Model):
@@ -39,13 +47,18 @@ class Document(models.Model):
         "catégorie", max_length=20, choices=Category.choices, default=Category.DIVERS
     )
     description = models.TextField("description", blank=True)
-    file_name = models.CharField("nom du fichier", max_length=255)
-    file_data = models.BinaryField("données du fichier")
+    file = models.FileField("fichier", upload_to=_pdf_upload_to)
+    # Taille en octets, mise en cache à l'upload (évite un HEAD stockage par ligne).
     file_size = models.PositiveIntegerField("taille (octets)", default=0)
     created_at = models.DateTimeField("créé le", auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
+
+    @property
+    def file_name(self):
+        """Nom de base du fichier (sans le préfixe de répertoire)."""
+        return self.file.name.rsplit("/", 1)[-1] if self.file else ""
 
     def __str__(self) -> str:
         return self.title
@@ -57,14 +70,19 @@ class Newsletter(models.Model):
     title = models.CharField("titre", max_length=200)
     edition = models.PositiveIntegerField("numéro d'édition", default=1)
     summary = models.TextField("résumé", blank=True)
-    file_name = models.CharField("nom du fichier", max_length=255)
-    file_data = models.BinaryField("données du fichier")
+    file = models.FileField("fichier", upload_to=_pdf_upload_to)
+    # Taille en octets, mise en cache à l'upload (évite un HEAD stockage par ligne).
     file_size = models.PositiveIntegerField("taille (octets)", default=0)
     published_at = models.DateField("publié le")
     created_at = models.DateTimeField("créé le", auto_now_add=True)
 
     class Meta:
         ordering = ["-published_at", "-edition"]
+
+    @property
+    def file_name(self):
+        """Nom de base du fichier (sans le préfixe de répertoire)."""
+        return self.file.name.rsplit("/", 1)[-1] if self.file else ""
 
     def __str__(self) -> str:
         return f"Édition {self.edition} — {self.title}"
@@ -84,6 +102,11 @@ class Application(models.Model):
     email = models.EmailField("e-mail")
     studies = models.CharField("filière / études", max_length=200)
     motivation = models.TextField("motivation")
+    # Preuve RGPD (art. 7) : horodatage + IP au moment du consentement.
+    consent_at = models.DateTimeField("consentement donné le", null=True, blank=True)
+    consent_ip = models.GenericIPAddressField(
+        "IP au moment du consentement", null=True, blank=True
+    )
     status = models.CharField(
         "statut", max_length=20, choices=Status.choices, default=Status.NOUVEAU
     )

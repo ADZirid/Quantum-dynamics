@@ -1,14 +1,14 @@
 """Crée le compte bureau initial si aucun staff n'existe.
 
-Les migrations sont appliquées par entrypoint.sh avant cette commande.
-Mot de passe : env ADMIN_PASSWORD, sinon valeur par défaut + warning sécurité.
+Les migrations sont appliquées avant cette commande.
+Mot de passe : obligatoire via la variable d'environnement ADMIN_PASSWORD.
+Aucun mot de passe par défaut n'est codé en dur pour ne pas exposer un secret
+dans le dépôt public.
 """
 import os
 
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
-
-DEFAULT_PASSWORD = "K6CctXHX3Z7tKX5dQd1"
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
@@ -22,13 +22,14 @@ class Command(BaseCommand):
 
         password = os.environ.get("ADMIN_PASSWORD", "").strip()
         if not password:
-            password = DEFAULT_PASSWORD
-            self.stderr.write(
-                self.style.WARNING(
-                    "⚠ SÉCURITÉ : mot de passe par défaut utilisé pour le compte "
-                    "'bureau' — changez ce mot de passe immédiatement "
-                    "(variable d'environnement ADMIN_PASSWORD)."
-                )
+            raise CommandError(
+                "Aucun compte staff n'existe et la variable d'environnement "
+                "ADMIN_PASSWORD n'est pas définie. Définissez ADMIN_PASSWORD "
+                "(12 caractères minimum) pour créer le compte 'bureau'."
+            )
+        if len(password) < 12:
+            raise CommandError(
+                "ADMIN_PASSWORD doit contenir au moins 12 caractères."
             )
 
         User.objects.create_superuser(
