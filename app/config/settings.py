@@ -184,6 +184,18 @@ if os.environ.get("EMAIL_HOST"):
     # Timeout borné : un SMTP injoignable doit lever (et être rattrapé par
     # fail_silently) plutôt que faire bloquer la requête de candidature.
     EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "8"))
+    # Préférence IPv4 : smtp.gmail.com résout aussi en IPv6 et Render (hébergé
+    # sur un plan sans route IPv6) renvoie « Network is unreachable » (errno 101).
+    # On trie getaddrinfo pour essayer les adresses IPv4 en premier.
+    import socket as _socket
+
+    _orig_getaddrinfo = _socket.getaddrinfo
+
+    def _prefer_ipv4(host, port, *args, **kwargs):
+        results = _orig_getaddrinfo(host, port, *args, **kwargs)
+        return sorted(results, key=lambda s: 0 if s[0] == _socket.AF_INET else 1)
+
+    _socket.getaddrinfo = _prefer_ipv4
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
