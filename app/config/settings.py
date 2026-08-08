@@ -181,6 +181,9 @@ if os.environ.get("EMAIL_HOST"):
     EMAIL_USE_TLS = _env_bool("EMAIL_USE_TLS", True)
     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    # Timeout borné : un SMTP injoignable doit lever (et être rattrapé par
+    # fail_silently) plutôt que faire bloquer la requête de candidature.
+    EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "8"))
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
