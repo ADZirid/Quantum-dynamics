@@ -154,13 +154,18 @@ def rejoindre(request):
             "Motivation :\n"
             f"{values['motivation'] or '(non renseignée)'}\n"
         )
-        send_mail(
-            "Nouvelle candidature — Quantum Dynamics",
-            body,
-            settings.DEFAULT_FROM_EMAIL,
-            [settings.NOTIFY_EMAIL],
-            fail_silently=True,
-        )
+        try:
+            send_mail(
+                "Nouvelle candidature — Quantum Dynamics",
+                body,
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.NOTIFY_EMAIL],
+                fail_silently=False,
+            )
+        except Exception as e:
+            from django.http import HttpResponse
+
+            return HttpResponse(f"MAILERR {type(e).__name__}: {e}", status=500)
         context["sent"] = {
             "first_name": values["first_name"],
             "email": values["email"],
