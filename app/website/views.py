@@ -159,7 +159,7 @@ def rejoindre(request):
             body,
             settings.DEFAULT_FROM_EMAIL,
                 [settings.NOTIFY_EMAIL],
-                fail_silently=False,
+                fail_silently=True,
             )
         context["sent"] = {
             "first_name": values["first_name"],
