@@ -1,5 +1,6 @@
 """Vues des pages publiques — Quantum Dynamics."""
 import re
+import threading
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -154,13 +155,19 @@ def rejoindre(request):
             "Motivation :\n"
             f"{values['motivation'] or '(non renseignée)'}\n"
         )
-        send_mail(
-            "Nouvelle candidature — Quantum Dynamics",
-            body,
-            settings.DEFAULT_FROM_EMAIL,
+        # Notification au bureau — asynchrone (thread en arrière-plan) et
+        # fail_silently : ni un SMTP lent ni un échec d'envoi ne doivent
+        # retarder ni bloquer la candidature.
+        def _notifier_bureau():
+            send_mail(
+                "Nouvelle candidature — Quantum Dynamics",
+                body,
+                settings.DEFAULT_FROM_EMAIL,
                 [settings.NOTIFY_EMAIL],
                 fail_silently=True,
             )
+
+        threading.Thread(target=_notifier_bureau, daemon=True).start()
         context["sent"] = {
             "first_name": values["first_name"],
             "email": values["email"],
