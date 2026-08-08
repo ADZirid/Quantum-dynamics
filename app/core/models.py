@@ -128,3 +128,22 @@ class RateLimitEntry(models.Model):
 
     def __str__(self) -> str:
         return f"{self.key} ({self.count})"
+
+
+def _delete_file_on_delete(sender, instance, **kwargs):
+    """Supprime le fichier stocké (local ou S3/B2) quand un objet est supprimé.
+
+    Django ne supprime pas automatiquement le fichier d'un FileField : sans ce
+    signal, les documents/newsletters supprimés laisseraient des orphelins dans
+    le stockage (disque ou bucket Backblaze B2).
+    """
+    file = getattr(instance, "file", None)
+    if file and file.name:
+        try:
+            file.storage.delete(file.name)
+        except Exception:
+            pass
+
+
+models.signals.post_delete.connect(_delete_file_on_delete, sender=Document)
+models.signals.post_delete.connect(_delete_file_on_delete, sender=Newsletter)
