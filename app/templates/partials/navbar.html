@@ -17,6 +17,10 @@
         L'association
         <span class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left bg-energy transition-transform duration-200 {% if request.path == '/association/' %}scale-x-100{% else %}scale-x-0 group-hover:scale-x-100{% endif %}" aria-hidden="true"></span>
       </a>
+      <a href="{% url 'projects:project_list' %}" class="group relative py-1 text-sm font-medium transition-colors {% if request.path|slice:':9' == '/projets/' %}text-ink{% else %}text-ink-3 hover:text-ink{% endif %}">
+        Projets
+        <span class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left bg-energy transition-transform duration-200 {% if request.path|slice:':9' == '/projets/' %}scale-x-100{% else %}scale-x-0 group-hover:scale-x-100{% endif %}" aria-hidden="true"></span>
+      </a>
       <a href="{% url 'library:newsletter_list' %}" class="group relative py-1 text-sm font-medium transition-colors {% if request.path == '/newsletter/' %}text-ink{% else %}text-ink-3 hover:text-ink{% endif %}">
         Newsletter
         <span class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left bg-energy transition-transform duration-200 {% if request.path == '/newsletter/' %}scale-x-100{% else %}scale-x-0 group-hover:scale-x-100{% endif %}" aria-hidden="true"></span>

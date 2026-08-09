@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "core",
     "website",
     "library",
+    "projects",
     "accounts_app",
 ]
 

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Projets — Quantum Dynamics{% endblock %}
+{% block meta_description %}Les projets des équipes de Quantum Dynamics : prototypes de transports, systèmes industriels et solutions énergétiques, conçus et testés en compétitions étudiantes.{% endblock %}
+{% block content %}
+{# ============ Section 1 — En-tête ============ #}
+<section class="relative overflow-hidden border-b border-line bg-paper py-16 md:py-24">
+  <div class="absolute inset-0 opacity-[0.06]" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 512px 512px;" aria-hidden="true"></div>
+  <div class="container-qd relative">
+    <p class="label-mono text-energy">[ Les projets ]</p>
+    <h1 class="mt-5 max-w-[18ch] font-display text-[40px] font-bold leading-[1.05] tracking-[-0.02em] text-ink md:text-[56px]">
+      De l'esquisse au prototype
+    </h1>
+    <p class="mt-6 max-w-[62ch] text-[17px] leading-relaxed text-ink-2 md:text-xl">
+      Chaque projet réunit une équipe autour d'une problématique concrète :
+      concevoir, prototyper, puis défendre le résultat en compétition.
+      Filtrez par domaine pour explorer les chantiers en cours.
+    </p>
+  </div>
+</section>
+
+{# ============ Section 2 — Filtre par domaine ============ #}
+<div class="sticky top-16 z-40 border-b border-line bg-paper/95 backdrop-blur-[8px]">
+  <div class="container-qd flex flex-wrap items-center gap-2 py-4">
+    <a href="{% url 'projects:project_list' %}" class="inline-flex items-center gap-1.5 rounded border px-3 py-2 font-mono text-[12px] uppercase tracking-[0.08em] transition-colors {% if not domaine_actif %}border-energy bg-energy/10 text-energy{% else %}border-line bg-white text-ink-2 hover:border-ink-3 hover:text-ink{% endif %}">
+      Tous <span class="opacity-70">({{ total_projets }})</span>
+    </a>
+    {% for domaine in domaines %}
+    <a href="{% url 'projects:project_list' %}?domaine={{ domaine.code }}" class="inline-flex items-center gap-1.5 rounded border px-3 py-2 font-mono text-[12px] uppercase tracking-[0.08em] transition-colors {% if domaine_actif == domaine.code %}border-energy bg-energy/10 text-energy{% else %}border-line bg-white text-ink-2 hover:border-ink-3 hover:text-ink{% endif %}">
+      <span class="h-2 w-2 rounded-full {{ domaine.dot }}" aria-hidden="true"></span>
+      {{ domaine.label }} <span class="opacity-70">({{ domaine.compteur }})</span>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+{# ============ Section 3 — Grille des projets ============ #}
+<section class="bg-paper py-10 md:py-14" aria-labelledby="titre-projets">
+  <div class="container-qd">
+    <h2 id="titre-projets" class="sr-only">Liste des projets</h2>
+
+    {% if total_projets == 0 %}
+    <div class="flex flex-col items-center rounded border border-dashed border-line bg-paper-2 p-10 text-center">
+      <svg class="h-10 w-10 text-ink-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <p class="mt-4 font-display text-lg font-medium text-ink">Les premiers projets seront publiés ici dès que les équipes seront lancées.</p>
+    </div>
+    {% elif not projets %}
+    <div class="flex flex-col items-center rounded border border-dashed border-line bg-paper-2 p-10 text-center">
+      <p class="font-display text-lg font-medium text-ink">Aucun projet dans ce domaine pour le moment.</p>
+      <a href="{% url 'projects:project_list' %}" class="btn-quiet mt-5">Voir tous les projets</a>
+    </div>
+    {% else %}
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {% for projet in projets %}
+      <article class="group flex flex-col rounded border border-line bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-energy hover:shadow-hover">
+        <a href="{% url 'projects:project_detail' pk=projet.pk %}" class="block overflow-hidden border-b border-line">
+          {% if projet.cover %}
+          <img src="{% url 'projects:project_image' kind='cover' pk=projet.pk %}" alt="{{ projet.title }}" class="aspect-[4/3] w-full object-cover transition-transform [transition-duration:400ms] ease-out group-hover:scale-[1.03]" loading="lazy">
+          {% else %}
+          <div class="flex aspect-[4/3] w-full items-center justify-center bg-paper-2">
+            <span class="font-display text-5xl font-bold tracking-[-0.02em] text-ink-3">0{{ forloop.counter }}</span>
+          </div>
+          {% endif %}
+        </a>
+        <div class="flex flex-1 flex-col p-6">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1 rounded border px-2 py-1 font-mono text-[11px] uppercase tracking-[0.08em] {{ projet.domaine_meta.tag }}">
+              <span class="h-1.5 w-1.5 rounded-full {{ projet.domaine_meta.dot }}" aria-hidden="true"></span>
+              {{ projet.domaine_meta.label }}
+            </span>
+            <span class="rounded border border-line px-2 py-1 font-mono text-[11px] uppercase tracking-[0.08em] text-ink-2">{{ projet.get_statut_display }}</span>
+          </div>
+          <h3 class="mt-3 font-display text-[19px] font-medium tracking-[-0.02em] text-ink md:text-[22px]">
+            <a href="{% url 'projects:project_detail' pk=projet.pk %}" class="after:absolute after:inset-0 hover:text-energy">{{ projet.title }}</a>
+          </h3>
+          <p class="mt-2 flex-1 text-sm leading-relaxed text-ink-2">{{ projet.summary }}</p>
+          <a href="{% url 'projects:project_detail' pk=projet.pk %}" class="relative z-10 mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-energy transition-colors hover:text-energy-deep">
+            Voir le projet
+            <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

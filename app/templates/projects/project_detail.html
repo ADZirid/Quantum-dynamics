@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ projet.title }} — Quantum Dynamics{% endblock %}
+{% block meta_description %}{{ projet.summary }}{% endblock %}
+{% block content %}
+{# ============ Section 1 — En-tête du projet ============ #}
+<section class="relative overflow-hidden border-b border-line bg-paper py-14 md:py-20">
+  <div class="absolute inset-0 opacity-[0.06]" style="background-image: url('{% static 'img/texture-grid.svg' %}'); background-size: 512px 512px;" aria-hidden="true"></div>
+  <div class="container-qd relative">
+    <nav class="flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.08em] text-ink-3" aria-label="Fil d'Ariane">
+      <a href="{% url 'projects:project_list' %}" class="transition-colors hover:text-energy">Projets</a>
+      <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      <span class="text-ink-2">{{ projet.domaine_meta.label }}</span>
+    </nav>
+
+    <div class="mt-6 flex flex-wrap items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 rounded border px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.08em] {{ projet.domaine_meta.tag }}">
+        <span class="h-1.5 w-1.5 rounded-full {{ projet.domaine_meta.dot }}" aria-hidden="true"></span>
+        {{ projet.domaine_meta.label }}
+      </span>
+      <span class="rounded border border-line px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.08em] text-ink-2">{{ projet.get_statut_display }}</span>
+    </div>
+
+    <h1 class="mt-5 max-w-[22ch] font-display text-[36px] font-bold leading-[1.05] tracking-[-0.02em] text-ink md:text-[56px]">{{ projet.title }}</h1>
+    <p class="mt-5 max-w-[62ch] text-[17px] leading-relaxed text-ink-2 md:text-xl">{{ projet.summary }}</p>
+  </div>
+</section>
+
+{# ============ Section 2 — Couverture + description ============ #}
+<section class="border-b border-line bg-paper py-10 md:py-14" aria-label="Présentation du projet">
+  <div class="container-qd grid gap-10 lg:grid-cols-12">
+    <div class="lg:col-span-7">
+      {% if projet.cover %}
+      <figure class="overflow-hidden border border-line bg-white">
+        <img src="{% url 'projects:project_image' kind='cover' pk=projet.pk %}" alt="Visuel du projet {{ projet.title }}" class="aspect-[16/9] w-full object-cover">
+      </figure>
+      {% endif %}
+    </div>
+    <div class="lg:col-span-5">
+      <p class="label-mono text-energy">[ Le projet ]</p>
+      <div class="mt-4 space-y-4 text-[15px] leading-relaxed text-ink-2">
+        {% for paragraphe in projet.description.splitlines %}
+        <p>{{ paragraphe }}</p>
+        {% endfor %}
+      </div>
+      <dl class="mt-8 space-y-3">
+        <div class="flex items-center justify-between border-t border-line pt-3">
+          <dt class="font-mono text-[12px] uppercase tracking-[0.08em] text-ink-3">Domaine</dt>
+          <dd class="text-sm font-medium text-ink">{{ projet.domaine_meta.label }}</dd>
+        </div>
+        <div class="flex items-center justify-between border-t border-line pt-3">
+          <dt class="font-mono text-[12px] uppercase tracking-[0.08em] text-ink-3">Statut</dt>
+          <dd class="text-sm font-medium text-ink">{{ projet.get_statut_display }}</dd>
+        </div>
+        <div class="flex items-center justify-between border-t border-b border-line py-3">
+          <dt class="font-mono text-[12px] uppercase tracking-[0.08em] text-ink-3">Publié le</dt>
+          <dd class="text-sm font-medium text-ink">{{ projet.published_at|date:"d/m/Y" }}</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+{# ============ Section 3 — Galerie photos ============ #}
+{% if photos %}
+<section class="bg-paper-2 py-10 md:py-14" aria-labelledby="titre-galerie">
+  <div class="container-qd">
+    <p class="label-mono text-energy">[ Galerie ]</p>
+    <h2 id="titre-galerie" class="mt-4 font-display text-2xl font-bold tracking-[-0.02em] text-ink md:text-3xl">Dans l'atelier</h2>
+    <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {% for photo in photos %}
+      <figure class="overflow-hidden border border-line bg-white">
+        <img src="{% url 'projects:project_image' kind='photo' pk=photo.pk %}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Photo du projet {{ projet.title }}{% endif %}" class="aspect-[4/3] w-full object-cover" loading="lazy">
+        {% if photo.caption %}
+        <figcaption class="px-4 py-3 text-[13px] text-ink-2">{{ photo.caption }}</figcaption>
+        {% endif %}
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ============ Section 4 — CTA retour ============ #}
+<section class="bg-paper py-10 md:py-14">
+  <div class="container-qd text-center">
+    <a href="{% url 'projects:project_list' %}" class="group inline-flex items-center gap-2 text-sm font-semibold text-energy transition-colors hover:text-energy-deep">
+      <svg class="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      Tous les projets
+    </a>
+  </div>
+</section>
+{% endblock %}

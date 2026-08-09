@@ -13,6 +13,7 @@ from core.views import download_file, serve_file
 urlpatterns = [
     path("", include("website.urls")),
     path("", include("library.urls")),
+    path("", include("projects.urls")),
     path("", include("accounts_app.urls")),
     path("fichiers/<str:kind>/<int:pk>/", serve_file, name="serve_file"),
     path(

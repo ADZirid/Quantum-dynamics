@@ -66,6 +66,10 @@
             <p class="mt-2 font-display text-3xl font-semibold text-ink">{{ counts.documents }}</p>
           </div>
           <div class="rounded border border-line bg-white p-5">
+            <p class="label-mono text-ink-3">Projets</p>
+            <p class="mt-2 font-display text-3xl font-semibold text-ink">{{ counts.projets }}</p>
+          </div>
+          <div class="rounded border border-line bg-white p-5">
             <p class="label-mono text-ink-3">Candidatures « nouveau »</p>
             <p class="mt-2 font-display text-3xl font-semibold text-signal">{{ counts.candidatures_nouveau }}</p>
           </div>
@@ -230,6 +234,178 @@
         </ul>
         {% else %}
         <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucun document publié pour le moment.</p>
+        {% endif %}
+      </section>
+
+      {# ================= Projets ================= #}
+      <section data-tab-panel="projets" {% if tab != 'projets' %}hidden{% endif %} aria-label="Projets">
+        <h1 class="font-display text-2xl font-medium tracking-[-0.02em] text-ink">Projets</h1>
+
+        <div class="mt-6 rounded border border-line bg-white p-6">
+          <h2 class="font-display text-lg font-medium text-ink">Ajouter un projet</h2>
+          <form method="post" action="{% url 'accounts_app:project_create' %}" enctype="multipart/form-data" class="mt-4 space-y-4">
+            {% csrf_token %}
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="pj-title" class="label-mono block text-ink-2">Titre</label>
+                <input id="pj-title" name="title" type="text" required maxlength="200" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="pj-order" class="label-mono block text-ink-2">Ordre d'affichage</label>
+                <input id="pj-order" name="display_order" type="number" min="0" step="1" value="0" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+            </div>
+            <div class="space-y-1.5">
+              <label for="pj-summary" class="label-mono block text-ink-2">Accroche (300 caractères max)</label>
+              <input id="pj-summary" name="summary" type="text" required maxlength="300" class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+            </div>
+            <div class="space-y-1.5">
+              <label for="pj-description" class="label-mono block text-ink-2">Description</label>
+              <textarea id="pj-description" name="description" rows="4" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none"></textarea>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="pj-domaine" class="label-mono block text-ink-2">Domaine</label>
+                <select id="pj-domaine" name="domaine" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  {% for value, label in projet_domaines %}
+                  <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="space-y-1.5">
+                <label for="pj-statut" class="label-mono block text-ink-2">Statut</label>
+                <select id="pj-statut" name="statut" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  {% for value, label in projet_statuts %}
+                  <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="space-y-1.5">
+                <label for="pj-published" class="label-mono block text-ink-2">Date de publication</label>
+                <input id="pj-published" name="published_at" type="date" required class="w-full rounded border border-line bg-white px-3.5 py-3 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+              </div>
+              <div class="space-y-1.5">
+                <label for="pj-cover" class="label-mono block text-ink-2">Image de couverture (optionnel, 10 Mo max)</label>
+                <input id="pj-cover" name="cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink file:mr-3 file:rounded file:border file:border-line file:bg-paper-2 file:px-3 file:py-1 file:text-[13px] file:font-medium file:text-ink-2">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Ajouter le projet</button>
+          </form>
+        </div>
+
+        <h2 class="mt-8 font-display text-lg font-medium text-ink">Projets publiés</h2>
+        {% if projets %}
+        <ul class="mt-4 space-y-3">
+          {% for projet in projets %}
+          <li class="rounded border border-line bg-white p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                {% if projet.cover %}
+                <img src="{% url 'projects:project_image' kind='cover' pk=projet.pk %}" alt="" class="h-12 w-16 rounded border border-line object-cover" width="64" height="48">
+                {% endif %}
+                <div>
+                  <p class="text-sm font-medium text-ink">{{ projet.title }}</p>
+                  <p class="text-[13px] text-ink-3">{{ projet.get_domaine_display }} · {{ projet.get_statut_display }} · ordre {{ projet.display_order }} · {{ projet.published_at|date:"d/m/Y" }}</p>
+                </div>
+              </div>
+              <form method="post" action="{% url 'accounts_app:project_delete' projet.pk %}" data-confirm="Supprimer définitivement le projet « {{ projet.title }} » ?">
+                {% csrf_token %}
+                <button type="submit" class="btn-quiet hover:border-danger/50 hover:text-danger">Supprimer</button>
+              </form>
+            </div>
+
+            <details class="mt-3">
+              <summary class="cursor-pointer text-[13px] font-medium text-ink-2 transition-colors hover:text-ink">Modifier</summary>
+              <div class="mt-3 space-y-4 border-t border-line pt-3">
+                <form method="post" action="{% url 'accounts_app:project_update' projet.pk %}" enctype="multipart/form-data" class="space-y-3">
+                  {% csrf_token %}
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="space-y-1.5">
+                      <label for="pj-edit-title-{{ projet.pk }}" class="label-mono block text-ink-2">Titre</label>
+                      <input id="pj-edit-title-{{ projet.pk }}" name="title" type="text" required maxlength="200" value="{{ projet.title }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                    </div>
+                    <div class="space-y-1.5">
+                      <label for="pj-edit-order-{{ projet.pk }}" class="label-mono block text-ink-2">Ordre</label>
+                      <input id="pj-edit-order-{{ projet.pk }}" name="display_order" type="number" min="0" step="1" value="{{ projet.display_order }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                    </div>
+                  </div>
+                  <div class="space-y-1.5">
+                    <label for="pj-edit-summary-{{ projet.pk }}" class="label-mono block text-ink-2">Accroche</label>
+                    <input id="pj-edit-summary-{{ projet.pk }}" name="summary" type="text" required maxlength="300" value="{{ projet.summary }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                  </div>
+                  <div class="space-y-1.5">
+                    <label for="pj-edit-description-{{ projet.pk }}" class="label-mono block text-ink-2">Description</label>
+                    <textarea id="pj-edit-description-{{ projet.pk }}" name="description" rows="3" required class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">{{ projet.description }}</textarea>
+                  </div>
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="space-y-1.5">
+                      <label for="pj-edit-domaine-{{ projet.pk }}" class="label-mono block text-ink-2">Domaine</label>
+                      <select id="pj-edit-domaine-{{ projet.pk }}" name="domaine" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                        {% for value, label in projet_domaines %}
+                        <option value="{{ value }}" {% if projet.domaine == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="space-y-1.5">
+                      <label for="pj-edit-statut-{{ projet.pk }}" class="label-mono block text-ink-2">Statut</label>
+                      <select id="pj-edit-statut-{{ projet.pk }}" name="statut" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                        {% for value, label in projet_statuts %}
+                        <option value="{{ value }}" {% if projet.statut == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="space-y-1.5">
+                      <label for="pj-edit-published-{{ projet.pk }}" class="label-mono block text-ink-2">Date de publication</label>
+                      <input id="pj-edit-published-{{ projet.pk }}" name="published_at" type="date" value="{{ projet.published_at|date:'Y-m-d' }}" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                    </div>
+                    <div class="space-y-1.5">
+                      <label for="pj-edit-cover-{{ projet.pk }}" class="label-mono block text-ink-2">Nouvelle couverture (optionnel)</label>
+                      <input id="pj-edit-cover-{{ projet.pk }}" name="cover" type="file" accept="image/jpeg,image/png,image/webp,image/gif" class="w-full rounded border border-line bg-white px-3.5 py-2 text-sm text-ink file:mr-2 file:rounded file:border file:border-line file:bg-paper-2 file:px-2.5 file:py-1 file:text-[12px] file:font-medium file:text-ink-2">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn-secondary">Enregistrer le projet</button>
+                </form>
+
+                {# Galerie : ajout d'une photo + liste #}
+                <div class="border-t border-line pt-3">
+                  <p class="label-mono text-ink-2">Galerie photos</p>
+                  <form method="post" action="{% url 'accounts_app:project_photo_add' projet.pk %}" enctype="multipart/form-data" class="mt-2 grid gap-3 sm:grid-cols-3 sm:items-end">
+                    {% csrf_token %}
+                    <div class="space-y-1.5">
+                      <label for="pj-photo-{{ projet.pk }}" class="label-mono block text-ink-2">Image (10 Mo max)</label>
+                      <input id="pj-photo-{{ projet.pk }}" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required class="w-full rounded border border-line bg-white px-3 py-2 text-sm text-ink file:mr-2 file:rounded file:border file:border-line file:bg-paper-2 file:px-2.5 file:py-1 file:text-[12px] file:font-medium file:text-ink-2">
+                    </div>
+                    <div class="space-y-1.5">
+                      <label for="pj-caption-{{ projet.pk }}" class="label-mono block text-ink-2">Légende</label>
+                      <input id="pj-caption-{{ projet.pk }}" name="caption" type="text" maxlength="200" placeholder="Optionnelle" class="w-full rounded border border-line bg-white px-3.5 py-2.5 text-sm text-ink transition-colors focus:border-energy focus:outline-none">
+                    </div>
+                    <button type="submit" class="btn-quiet justify-center">Ajouter la photo</button>
+                  </form>
+                  {% if projet.photos.all %}
+                  <ul class="mt-3 flex flex-wrap gap-3">
+                    {% for photo in projet.photos.all %}
+                    <li class="relative">
+                      <img src="{% url 'projects:project_image' kind='photo' pk=photo.pk %}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Photo{% endif %}" class="h-16 w-24 rounded border border-line object-cover" width="96" height="64" loading="lazy">
+                      <form method="post" action="{% url 'accounts_app:project_photo_delete' photo.pk %}" class="absolute right-1 top-1" data-confirm="Supprimer cette photo ?">
+                        {% csrf_token %}
+                        <button type="submit" class="flex h-6 w-6 items-center justify-center rounded-full border border-danger/40 bg-white text-danger" aria-label="Supprimer la photo"><svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+                      </form>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+              </div>
+            </details>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="mt-4 rounded border border-line bg-white px-4 py-6 text-sm text-ink-3">Aucun projet pour le moment.</p>
         {% endif %}
       </section>
 

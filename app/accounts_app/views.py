@@ -11,6 +11,7 @@ Sécurité :
 """
 import csv
 import io
+import os
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout, update_session_auth_hash
@@ -22,7 +23,14 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from core.models import Application, Document, Member, Newsletter
+from core.models import (
+    Application,
+    Document,
+    Member,
+    Newsletter,
+    Project,
+    ProjectPhoto,
+)
 from core.ratelimit import client_ip, consume
 
 User = get_user_model()
@@ -32,8 +40,19 @@ LOCKED_ERROR = "Trop de tentatives, réessayez dans quelques minutes."
 
 MAX_PDF_SIZE = 15 * 1024 * 1024  # 15 Mo
 PDF_MAGIC = b"%PDF-"
+MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 Mo
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 
-VALID_TABS = {"overview", "newsletter", "documents", "candidatures", "bureau", "utilisateurs", "securite"}
+VALID_TABS = {
+    "overview",
+    "newsletter",
+    "documents",
+    "projets",
+    "candidatures",
+    "bureau",
+    "utilisateurs",
+    "securite",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -101,6 +120,31 @@ def _validate_pdf(upload):
     return None, None
 
 
+def _validate_image(upload):
+    """Validation stricte d'une image (couverture / galerie de projets).
+
+    Vérifie l'extension, la taille (10 Mo max) puis décode réellement l'image
+    avec Pillow (une simple extension ne garantit pas un vrai fichier image).
+    Retourne (None, message_erreur).
+    """
+    if upload is None:
+        return None, "Veuillez joindre une image (jpg, png, webp ou gif)."
+    if upload.size > MAX_IMAGE_SIZE:
+        return None, "L'image dépasse la taille maximale autorisée (10 Mo)."
+    ext = os.path.splitext(upload.name)[1].lower()
+    if ext not in IMAGE_EXTENSIONS:
+        return None, "Le fichier n'est pas une image valide (jpg, png, webp, gif attendu)."
+    try:
+        from PIL import Image
+
+        upload.seek(0)
+        Image.open(upload).verify()
+        upload.seek(0)
+    except Exception:
+        return None, "Le fichier n'est pas une image valide."
+    return None, None
+
+
 def _validate_photo_url(raw: str):
     """photo_url optionnelle ; vide = monogramme côté public."""
     raw = raw.strip()
@@ -140,6 +184,7 @@ def dashboard(request):
             ("overview", "Vue d'ensemble"),
             ("newsletter", "Newsletter"),
             ("documents", "Documents"),
+            ("projets", "Projets"),
             ("candidatures", "Candidatures"),
             ("bureau", "Bureau & membres"),
             ("utilisateurs", "Utilisateurs"),
@@ -148,6 +193,7 @@ def dashboard(request):
         "counts": {
             "newsletters": Newsletter.objects.count(),
             "documents": Document.objects.count(),
+            "projets": Project.objects.count(),
             "candidatures_nouveau": Application.objects.filter(
                 status=Application.Status.NOUVEAU
             ).count(),
@@ -157,6 +203,10 @@ def dashboard(request):
         "newsletters": Newsletter.objects.all(),
         "documents": Document.objects.all(),
         "document_categories": Document.Category.choices,
+        "projets": Project.objects.all(),
+        "projet_domaines": Project.Domaine.choices,
+        "projet_statuts": Project.Statut.choices,
+        "projet_photos": ProjectPhoto.objects.all(),
         "candidatures": Application.objects.all(),
         "candidature_statuses": Application.Status.choices,
         "filtre_statut": request.GET.get("statut", ""),
@@ -296,6 +346,187 @@ def document_delete(request, pk):
     document.delete()
     messages.success(request, f"Document « {titre} » supprimé.")
     return redirect(_dashboard_url("documents"))
+
+
+# --- Projets ----------------------------------------------------------------
+
+def _validate_date_texte(raw: str):
+    """Date de publication : format aaaa-mm-jj, sinon message d'erreur."""
+    from datetime import date
+
+    try:
+        return date.fromisoformat(raw.strip()), None
+    except ValueError:
+        return None, "La date de publication est invalide (format aaaa-mm-jj)."
+
+
+@login_required
+@require_POST
+def project_create(request):
+    title = request.POST.get("title", "").strip()
+    summary = request.POST.get("summary", "").strip()
+    description = request.POST.get("description", "").strip()
+    domaine = request.POST.get("domaine", "").strip()
+    statut = request.POST.get("statut", "").strip()
+    display_order, err = _validate_display_order(request.POST.get("display_order", "0"))
+    if err:
+        messages.error(request, err)
+        return redirect(_dashboard_url("projets"))
+    published_at, err = _validate_date_texte(request.POST.get("published_at", ""))
+    if err:
+        messages.error(request, err)
+        return redirect(_dashboard_url("projets"))
+
+    if not title:
+        messages.error(request, "Le titre est obligatoire.")
+        return redirect(_dashboard_url("projets"))
+    if len(summary) > 300:
+        messages.error(request, "L'accroche ne doit pas dépasser 300 caractères.")
+        return redirect(_dashboard_url("projets"))
+    if not description:
+        messages.error(request, "La description est obligatoire.")
+        return redirect(_dashboard_url("projets"))
+    if domaine not in Project.Domaine.values:
+        messages.error(request, "Le domaine est invalide.")
+        return redirect(_dashboard_url("projets"))
+    if statut not in Project.Statut.values:
+        messages.error(request, "Le statut est invalide.")
+        return redirect(_dashboard_url("projets"))
+
+    cover = request.FILES.get("cover")
+    if cover:
+        _, err = _validate_image(cover)
+        if err:
+            messages.error(request, err)
+            return redirect(_dashboard_url("projets"))
+
+    projet = Project(
+        title=title,
+        summary=summary,
+        description=description,
+        domaine=domaine,
+        statut=statut,
+        display_order=display_order,
+        published_at=published_at,
+    )
+    if cover:
+        projet.cover = cover
+        projet.cover_size = cover.size
+    projet.save()
+    messages.success(request, f"Projet « {title} » ajouté.")
+    return redirect(_dashboard_url("projets"))
+
+
+@login_required
+@require_POST
+def project_update(request, pk):
+    """Édition des métadonnées + remplacement éventuel de la couverture."""
+    projet = get_object_or_404(Project, pk=pk)
+    title = request.POST.get("title", "").strip()
+    summary = request.POST.get("summary", "").strip()
+    description = request.POST.get("description", "").strip()
+    domaine = request.POST.get("domaine", "").strip()
+    statut = request.POST.get("statut", "").strip()
+    display_order, err = _validate_display_order(request.POST.get("display_order", "0"))
+    if err:
+        messages.error(request, err)
+        return redirect(_dashboard_url("projets"))
+    published_at, err = _validate_date_texte(request.POST.get("published_at", ""))
+    if err:
+        messages.error(request, err)
+        return redirect(_dashboard_url("projets"))
+
+    if not title:
+        messages.error(request, "Le titre est obligatoire.")
+        return redirect(_dashboard_url("projets"))
+    if len(summary) > 300:
+        messages.error(request, "L'accroche ne doit pas dépasser 300 caractères.")
+        return redirect(_dashboard_url("projets"))
+    if not description:
+        messages.error(request, "La description est obligatoire.")
+        return redirect(_dashboard_url("projets"))
+    if domaine not in Project.Domaine.values:
+        messages.error(request, "Le domaine est invalide.")
+        return redirect(_dashboard_url("projets"))
+    if statut not in Project.Statut.values:
+        messages.error(request, "Le statut est invalide.")
+        return redirect(_dashboard_url("projets"))
+
+    cover = request.FILES.get("cover")
+    if cover:
+        _, err = _validate_image(cover)
+        if err:
+            messages.error(request, err)
+            return redirect(_dashboard_url("projets"))
+
+    projet.title = title
+    projet.summary = summary
+    projet.description = description
+    projet.domaine = domaine
+    projet.statut = statut
+    projet.display_order = display_order
+    projet.published_at = published_at
+    if cover:
+        if projet.cover and projet.cover.name:
+            try:
+                projet.cover.storage.delete(projet.cover.name)
+            except Exception:
+                pass
+        projet.cover = cover
+        projet.cover_size = cover.size
+    projet.save()
+    messages.success(request, f"Projet « {title} » mis à jour.")
+    return redirect(_dashboard_url("projets"))
+
+
+@login_required
+@require_POST
+def project_delete(request, pk):
+    projet = get_object_or_404(Project, pk=pk)
+    titre = projet.title
+    projet.delete()
+    messages.success(request, f"Projet « {titre} » supprimé.")
+    return redirect(_dashboard_url("projets"))
+
+
+@login_required
+@require_POST
+def project_photo_add(request, pk):
+    """Ajoute une photo à la galerie d'un projet."""
+    projet = get_object_or_404(Project, pk=pk)
+    image = request.FILES.get("image")
+    _, err = _validate_image(image)
+    if err:
+        messages.error(request, err)
+        return redirect(_dashboard_url("projets"))
+    caption = request.POST.get("caption", "").strip()
+    if len(caption) > 200:
+        messages.error(request, "La légende ne doit pas dépasser 200 caractères.")
+        return redirect(_dashboard_url("projets"))
+    display_order, err = _validate_display_order(request.POST.get("display_order", "0"))
+    if err:
+        messages.error(request, err)
+        return redirect(_dashboard_url("projets"))
+
+    ProjectPhoto.objects.create(
+        project=projet,
+        image=image,
+        image_size=image.size,
+        caption=caption,
+        display_order=display_order,
+    )
+    messages.success(request, f"Photo ajoutée au projet « {projet.title} ».")
+    return redirect(_dashboard_url("projets"))
+
+
+@login_required
+@require_POST
+def project_photo_delete(request, pk):
+    photo = get_object_or_404(ProjectPhoto, pk=pk)
+    titre = photo.project.title
+    photo.delete()
+    messages.success(request, f"Photo supprimée du projet « {titre} ».")
+    return redirect(_dashboard_url("projets"))
 
 
 # --- Candidatures -----------------------------------------------------------

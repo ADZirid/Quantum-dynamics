@@ -27,6 +27,7 @@
     <nav class="container-qd flex flex-1 flex-col justify-center gap-6" aria-label="Navigation mobile">
       <a href="{% url 'website:home' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Accueil</a>
       <a href="{% url 'website:association' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/association/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">L'association</a>
+      <a href="{% url 'projects:project_list' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path|slice:':9' == '/projets/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Projets</a>
       <a href="{% url 'library:newsletter_list' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/newsletter/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Newsletter</a>
       <a href="{% url 'library:document_list' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/documents/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Documents</a>
       <a href="{% url 'website:rejoindre' %}" class="font-display text-[28px] font-medium tracking-[-0.02em] transition-colors {% if request.path == '/rejoindre/' %}text-energy{% else %}text-ink hover:text-energy{% endif %}">Rejoindre</a>
